@@ -25,7 +25,7 @@ Of 190 approved antibodies with a known sequence source, **67 are fully human, a
 34 of those were approved in 2020–25 alone**, more than the field produced in its
 entire first two decades.
 
-A fully human antibody dosed into an immunocompetent mouse may be considered a foreign protein: the animal raises anti-drug antibodies against the
+A fully human antibody introduced into a naive mouse may be considered a foreign protein: the animal raises anti-drug antibodies against the
 framework, which limits repeat-dose studies or translational accuracy. The standard answer is a species-matched
 surrogate. These models generate one directly from the human sequence.
 
@@ -43,7 +43,7 @@ generation technology, 1994–2025.
 
 ## Results
 
-### The models beat a lookup-table control
+### Model vs lookup-table control
 
 Antibody framework positions are highly conserved, so a model can score well by
 predicting the most common residue at each position. The control is to build exactly
@@ -58,9 +58,7 @@ that table from the training germlines and score it on the same masked positions
 
 Masked-residue recovery on held-out V genes, 52,000 predictions per species.
 
-**The margin lives where the lookup table fails.** Bucketing by how conserved each
-position is, the models add nothing where the answer is already obvious and
-everything where it isn't:
+The fine-tuned models outperform the baseline primarily at low-conservation positions where static consensus rules fail:
 
 | Conservation | Mouse (model / control) | Macaque (model / control) |
 |---|---|---|
@@ -71,7 +69,7 @@ everything where it isn't:
 📊 [Mouse diagnostics](docs/04-diagnostics-mouse.html) ·
 [Two-species QC](docs/05-diagnostics-two-species.html)
 
-### Held-out germlines are the honest measure
+### Evaluating on unseen germlines avoids data leakage
 
 A random validation split leaks badly. Measured directly, as the Hamming distance from
 each validation sequence to its nearest training sequence:
@@ -86,8 +84,8 @@ something the model trained on**. These are somatic-hypermutation variants of th
 germline landing on both sides. Every headline number in this repo uses the V-gene
 split.
 
-The cost is real and measurable: 94.77% on a random split versus 90.13% on held-out
-germlines. The ~4.6-point gap is the genuine price of an unseen V gene.
+Results from splitting: 94.77% on a random split versus 90.13% on held-out
+germlines. The ~4.6-point gap is the drop when predicting unseen V gene.
 
 📊 [Germline generalization](docs/02-germline-generalization.html) ·
 [Data controls](docs/06-data-controls.html)
@@ -139,7 +137,7 @@ human→mouse VH3 changes (Q13K, S14P, R16G, R19K) with no germline reference gi
 
 ---
 
-## How it works
+## Computational Approach
 
 ```mermaid
 flowchart LR
@@ -235,7 +233,7 @@ repo to document why.
 
 At 4% of training the switch was already inert: converting the same sequence to mouse
 and to macaque produced **byte-identical output**, with log-likelihoods agreeing to
-four decimals. The cause is structural, not a training shortfall. With 15% masking,
+four decimals. The cause is structural, not due to training. With 15% masking,
 the 85% of residues still visible identify the species unambiguously, so the marker
 carries no information, receives no gradient, and is ignored. Conversion then asks the
 model to honour a marker that *contradicts* its context, a case that never occurs in
@@ -260,10 +258,6 @@ measured per-position accuracy, and they can disagree sharply. The hardest posit
 in both species flank the CDRs, and macaque position 41 is only 24.4% accurate, because
 those Vernier-zone residues are structurally coupled to CDRs the model never sees.
 Cross-check proposals against `analysis/qc_results_*.json`.
-
-**No human training data.** Both models were trained on mouse and macaque only, so a
-human input is out of distribution. Frameworks are conserved enough that it works, but
-adding a human OAS set would make conversion better grounded.
 
 **Heavy chain only**, IgM, and the canonical 91-residue framework layout (97–100% of
 sequences). Light chains and non-canonical lengths are not handled.
