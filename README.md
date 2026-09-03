@@ -18,16 +18,15 @@ python convert_framework.py --to mouse \
 
 ---
 
-## Why
+## Introduction
 
 Therapeutic antibodies moved from murine to chimeric to humanized to fully human.
 Of 190 approved antibodies with a known sequence source, **67 are fully human, and
 34 of those were approved in 2020–25 alone**, more than the field produced in its
 entire first two decades.
 
-That creates a testing problem. A fully human antibody dosed into an immunocompetent
-mouse is foreign protein: the animal raises anti-drug antibodies against the
-framework, which limits repeat-dose studies. The standard answer is a species-matched
+A fully human antibody dosed into an immunocompetent mouse may be considered a foreign protein: the animal raises anti-drug antibodies against the
+framework, which limits repeat-dose studies or translational accuracy. The standard answer is a species-matched
 surrogate. These models generate one directly from the human sequence.
 
 📊 **[The Human Antibody Gap](docs/07-approvals.html)**: cumulative approvals by
