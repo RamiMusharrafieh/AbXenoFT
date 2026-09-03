@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#f9f9f7;color:#0b0b0b}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>ESM-2 Framework Run</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    color-scheme: light;
+    --plane:      #f9f9f7;
+    --surface:    #fcfcfb;
+    --ink:        #0b0b0b;
+    --ink-2:      #52514e;
+    --muted:      #898781;
+    --grid:       #e1e0d9;
+    --axis:       #c3c2b7;
+    --hair:       rgba(11,11,11,0.10);
+    --s1:         #2a78d6;
+    --s2:         #eb6834;
+    --wash:       rgba(42,120,214,0.07);
+    --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --plane:   #0d0d0d;
+      --surface: #1a1a19;
+      --ink:     #ffffff;
+      --ink-2:   #c3c2b7;
+      --muted:   #898781;
+      --grid:    #2c2c2a;
+      --axis:    #383835;
+      --hair:    rgba(255,255,255,0.10);
+      --s1:      #3987e5;
+      --s2:      #d95926;
+      --wash:    rgba(57,135,229,0.10);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --plane:   #0d0d0d;
+    --surface: #1a1a19;
+    --ink:     #ffffff;
+    --ink-2:   #c3c2b7;
+    --muted:   #898781;
+    --grid:    #2c2c2a;
+    --axis:    #383835;
+    --hair:    rgba(255,255,255,0.10);
+    --s1:      #3987e5;
+    --s2:      #d95926;
+    --wash:    rgba(57,135,229,0.10);
+  }
+
+  body { background: var(--plane); color: var(--ink); font-family: var(--sans); }
+  * { box-sizing: border-box; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 40px 24px 72px; display: flex; flex-direction: column; gap: 28px; }
+
+  .eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+
+  header h1 { font-size: clamp(26px, 4vw, 36px); font-weight: 600; letter-spacing: -.02em; margin: 10px 0 8px; text-wrap: balance; }
+  header p { margin: 0; color: var(--ink-2); font-size: 15px; line-height: 1.6; max-width: 66ch; }
+
+  .meta { display: flex; flex-wrap: wrap; gap: 6px 20px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--hair);
+          font-family: var(--mono); font-size: 12px; color: var(--ink-2); }
+  .meta b { font-weight: 500; color: var(--muted); }
+
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(168px, 1fr)); gap: 1px; background: var(--hair);
+           border: 1px solid var(--hair); border-radius: 3px; overflow: hidden; }
+  .stat { background: var(--surface); padding: 16px 18px; display: flex; flex-direction: column; gap: 5px; }
+  .stat .k { font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  .stat .v { font-size: 25px; font-weight: 600; letter-spacing: -.02em; line-height: 1.05; }
+  .stat .s { font-size: 12px; color: var(--ink-2); }
+  .stat .s i { font-style: normal; color: var(--muted); }
+
+  .card { background: var(--surface); border: 1px solid var(--hair); border-radius: 3px; padding: 18px 20px 14px; }
+  .card > header { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 4px; }
+  .card h2 { font-size: 15px; font-weight: 600; margin: 0; letter-spacing: -.01em; }
+  .card .sub { font-size: 12.5px; color: var(--ink-2); margin: 3px 0 0; max-width: 70ch; line-height: 1.55; }
+
+  .seg { display: inline-flex; border: 1px solid var(--hair); border-radius: 3px; overflow: hidden; }
+  .seg button { font-family: var(--mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase;
+                padding: 5px 11px; background: transparent; color: var(--ink-2); border: 0; cursor: pointer; }
+  .seg button + button { border-left: 1px solid var(--hair); }
+  .seg button[aria-pressed="true"] { background: var(--wash); color: var(--ink); font-weight: 500; }
+  .seg button:focus-visible, .tbtn:focus-visible { outline: 2px solid var(--s1); outline-offset: -2px; }
+
+  .legend { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; margin: 10px 0 2px; font-size: 12.5px; color: var(--ink-2); }
+  .legend span { display: inline-flex; align-items: center; gap: 7px; }
+  .swatch { width: 13px; height: 3px; border-radius: 2px; display: inline-block; }
+
+  .plot { position: relative; width: 100%; }
+  .plot svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .grid  { stroke: var(--grid); stroke-width: 1; }
+  .axis  { stroke: var(--axis); stroke-width: 1; }
+  .tick  { font-family: var(--mono); font-size: 10.5px; fill: var(--muted); font-variant-numeric: tabular-nums; }
+  .atitle{ font-family: var(--sans); font-size: 11.5px; fill: var(--muted); }
+  .dlabel{ font-family: var(--mono); font-size: 11px; font-weight: 500; font-variant-numeric: tabular-nums; }
+
+  .tip { position: absolute; pointer-events: none; opacity: 0; transform: translate(-50%, 0);
+         background: var(--surface); border: 1px solid var(--hair); border-radius: 3px; padding: 8px 10px;
+         box-shadow: 0 6px 20px rgba(0,0,0,.13); font-family: var(--mono); font-size: 11.5px; white-space: nowrap;
+         color: var(--ink); z-index: 5; font-variant-numeric: tabular-nums; }
+  .tip .r { display: flex; align-items: center; gap: 7px; }
+  .tip .r + .r { margin-top: 3px; }
+  .tip .hd { color: var(--muted); margin-bottom: 5px; letter-spacing: .04em; }
+  .tip .dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+
+  .panels { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 20px; }
+
+  .tbtn { font-family: var(--mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; padding: 6px 12px;
+          background: transparent; border: 1px solid var(--hair); border-radius: 3px; color: var(--ink-2); cursor: pointer; }
+  .tablewrap { overflow-x: auto; margin-top: 14px; }
+  table { border-collapse: collapse; width: 100%; font-family: var(--mono); font-size: 12px; font-variant-numeric: tabular-nums; }
+  th, td { text-align: right; padding: 6px 10px; border-bottom: 1px solid var(--hair); white-space: nowrap; }
+  th { color: var(--muted); font-weight: 500; font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; }
+  td { color: var(--ink-2); }
+  tr.best td { color: var(--ink); font-weight: 500; background: var(--wash); }
+  td:first-child, th:first-child { text-align: left; }
+
+  footer { font-size: 12.5px; color: var(--muted); line-height: 1.65; border-top: 1px solid var(--hair); padding-top: 16px; max-width: 74ch; }
+  footer code { font-family: var(--mono); font-size: 11.5px; color: var(--ink-2); }
+</style>
+
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Masked language modelling &middot; run log</div>
+    <h1>ESM-2 on mouse framework space</h1>
+    <p>One epoch of MLM fine-tuning of <code style="font-family:var(--mono);font-size:13.5px">facebook/esm2_t6_8M_UR50D</code> over 2,767,822 unique mouse heavy-chain framework sequences (FR1–FR4 concatenated, CDRs removed) drawn from four OAS naive-B-cell repertoires. Embeddings and encoder layers 0–3 frozen; layers 4–5 and the MLM head trained.</p>
+    <div class="meta">
+      <span><b>steps</b> 138,392</span>
+      <span><b>batch</b> 16</span>
+      <span><b>mlm p</b> 0.15</span>
+      <span><b>peak lr</b> 1e-4</span>
+      <span><b>trainable</b> 2,580,513 / 7,523,034</span>
+      <span><b>device</b> Apple M1 (MPS)</span>
+      <span><b>wall</b> 5.2 h</span>
+    </div>
+  </header>
+
+  <section class="stats">
+    <div class="stat">
+      <span class="k">Perplexity</span>
+      <span class="v">1.220</span>
+      <span class="s"><i>from</i> 10.409 <i>baseline</i></span>
+    </div>
+    <div class="stat">
+      <span class="k">Validation loss</span>
+      <span class="v">0.1983</span>
+      <span class="s"><i>best, at step</i> 138,392</span>
+    </div>
+    <div class="stat">
+      <span class="k">Masked recovery</span>
+      <span class="v">95.5%</span>
+      <span class="s"><i>vs</i> 21.7% <i>stock ESM-2</i></span>
+    </div>
+    <div class="stat">
+      <span class="k">Held-out split</span>
+      <span class="v">553,565</span>
+      <span class="s"><i>of</i> 2,767,822 <i>sequences</i></span>
+    </div>
+  </section>
+
+  <section class="card">
+    <header>
+      <div>
+        <h2>Loss across all 138,392 steps</h2>
+        <p class="sub">Log axis by default: loss falls 2.28&nbsp;&rarr;&nbsp;0.19, and 92% of that drop happens in the first 5,000 steps. On a linear axis the run reads as a cliff followed by a flat line, which hides everything after step 10,000.</p>
+      </div>
+      <div class="seg" role="group" aria-label="y-axis scale">
+        <button id="b-log" aria-pressed="true">Log</button>
+        <button id="b-lin" aria-pressed="false">Linear</button>
+      </div>
+    </header>
+    <div class="legend">
+      <span><i class="swatch" style="background:var(--s1)"></i> Training loss <i style="color:var(--muted);font-style:normal">(logged every 200 steps)</i></span>
+      <span><i class="swatch" style="background:var(--s2)"></i> Validation loss <i style="color:var(--muted);font-style:normal">(10,000-sequence subsample, every 5,000 steps)</i></span>
+    </div>
+    <div class="plot" id="p-main"><div class="tip" id="t-main"></div></div>
+  </section>
+
+  <section class="panels">
+    <div class="card">
+      <header><div>
+        <h2>The plateau, up close</h2>
+        <p class="sub">Steps 20,000 onward on a linear axis. The band is roughly 0.19–0.23; validation oscillates ±0.005 because masking is resampled each pass.</p>
+      </div></header>
+      <div class="legend">
+        <span><i class="swatch" style="background:var(--s1)"></i> Training</span>
+        <span><i class="swatch" style="background:var(--s2)"></i> Validation</span>
+      </div>
+      <div class="plot" id="p-zoom"><div class="tip" id="t-zoom"></div></div>
+    </div>
+
+    <div class="card">
+      <header><div>
+        <h2>Learning-rate schedule</h2>
+        <p class="sub">Linear warmup over the first 5% of steps, then linear decay to zero. The anneal is why the best validation loss lands on the final step rather than mid-run.</p>
+      </div></header>
+      <div class="plot" id="p-lr"><div class="tip" id="t-lr"></div></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <header>
+      <div>
+        <h2>Validation checkpoints</h2>
+        <p class="sub">Every evaluation pass, with perplexity as exp(loss). Best row highlighted.</p>
+      </div>
+      <button class="tbtn" id="b-table" aria-expanded="false" aria-controls="tablewrap">Show table</button>
+    </header>
+    <div class="tablewrap" id="tablewrap" hidden>
+      <table>
+        <thead><tr><th>Step</th><th>Epoch</th><th>Validation loss</th><th>Perplexity</th></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    Source: <code>trainer_state.json</code> from <code>checkpoint-138392</code>, containing 691 training points and 28 evaluation points, the complete logged history of the run. Baseline (step 0) measured before any weight update. Note that the 80/20 split is random over unique sequences, so somatic-hypermutation variants of the same germline V gene appear on both sides; the validation curve is therefore optimistic as a measure of generalisation to unseen germlines.
+  </footer>
+</div>
+
+<script id="run-data" type="application/json">{"train": [{"step": 200, "loss": 2.28311, "lr": 2.8761381702558176e-06, "gn": 2.0572}, {"step": 400, "loss": 1.83606, "lr": 5.766729296141061e-06, "gn": 2.7976}, {"step": 600, "loss": 1.29627, "lr": 8.657320422026304e-06, "gn": 2.6809}, {"step": 800, "loss": 1.03487, "lr": 1.1547911547911548e-05, "gn": 3.5778}, {"step": 1000, "loss": 0.89818, "lr": 1.4438502673796791e-05, "gn": 2.9025}, {"step": 1200, "loss": 0.83388, "lr": 1.7329093799682038e-05, "gn": 2.374}, {"step": 1400, "loss": 0.7457, "lr": 2.021968492556728e-05, "gn": 2.9691}, {"step": 1600, "loss": 0.70935, "lr": 2.3110276051452524e-05, "gn": 3.4464}, {"step": 1800, "loss": 0.65835, "lr": 2.600086717733777e-05, "gn": 2.9109}, {"step": 2000, "loss": 0.62499, "lr": 2.8891458303223014e-05, "gn": 2.7139}, {"step": 2200, "loss": 0.6036, "lr": 3.178204942910825e-05, "gn": 2.5777}, {"step": 2400, "loss": 0.57798, "lr": 3.46726405549935e-05, "gn": 2.3298}, {"step": 2600, "loss": 0.5586, "lr": 3.756323168087874e-05, "gn": 2.8756}, {"step": 2800, "loss": 0.53382, "lr": 4.045382280676399e-05, "gn": 2.849}, {"step": 3000, "loss": 0.52396, "lr": 4.334441393264923e-05, "gn": 2.4628}, {"step": 3200, "loss": 0.49415, "lr": 4.623500505853448e-05, "gn": 1.8149}, {"step": 3400, "loss": 0.48695, "lr": 4.912559618441971e-05, "gn": 2.2057}, {"step": 3600, "loss": 0.46112, "lr": 5.201618731030497e-05, "gn": 1.9925}, {"step": 3800, "loss": 0.4644, "lr": 5.49067784361902e-05, "gn": 1.8834}, {"step": 4000, "loss": 0.44353, "lr": 5.779736956207544e-05, "gn": 2.6109}, {"step": 4200, "loss": 0.43124, "lr": 6.0687960687960685e-05, "gn": 2.0773}, {"step": 4400, "loss": 0.4287, "lr": 6.357855181384593e-05, "gn": 1.7743}, {"step": 4600, "loss": 0.40878, "lr": 6.646914293973118e-05, "gn": 1.9097}, {"step": 4800, "loss": 0.40937, "lr": 6.935973406561642e-05, "gn": 1.5559}, {"step": 5000, "loss": 0.40389, "lr": 7.225032519150166e-05, "gn": 1.8484}, {"step": 5200, "loss": 0.40127, "lr": 7.51409163173869e-05, "gn": 1.4943}, {"step": 5400, "loss": 0.37942, "lr": 7.803150744327216e-05, "gn": 2.1755}, {"step": 5600, "loss": 0.38068, "lr": 8.09220985691574e-05, "gn": 2.2099}, {"step": 5800, "loss": 0.37288, "lr": 8.381268969504264e-05, "gn": 1.4858}, {"step": 6000, "loss": 0.36155, "lr": 8.670328082092789e-05, "gn": 1.4373}, {"step": 6200, "loss": 0.3658, "lr": 8.959387194681313e-05, "gn": 1.3533}, {"step": 6400, "loss": 0.36298, "lr": 9.248446307269837e-05, "gn": 1.9431}, {"step": 6600, "loss": 0.34877, "lr": 9.537505419858361e-05, "gn": 1.6286}, {"step": 6800, "loss": 0.34881, "lr": 9.826564532446885e-05, "gn": 1.6571}, {"step": 7000, "loss": 0.34007, "lr": 9.993915100438874e-05, "gn": 1.4684}, {"step": 7200, "loss": 0.3323, "lr": 9.978702851536058e-05, "gn": 2.0806}, {"step": 7400, "loss": 0.32859, "lr": 9.963490602633241e-05, "gn": 1.2956}, {"step": 7600, "loss": 0.33337, "lr": 9.948278353730425e-05, "gn": 1.3731}, {"step": 7800, "loss": 0.32441, "lr": 9.933066104827608e-05, "gn": 1.366}, {"step": 8000, "loss": 0.32198, "lr": 9.917853855924792e-05, "gn": 1.3573}, {"step": 8200, "loss": 0.32476, "lr": 9.902641607021974e-05, "gn": 1.355}, {"step": 8400, "loss": 0.31856, "lr": 9.887429358119159e-05, "gn": 1.4616}, {"step": 8600, "loss": 0.31166, "lr": 9.872217109216342e-05, "gn": 1.2792}, {"step": 8800, "loss": 0.3041, "lr": 9.857004860313524e-05, "gn": 1.3736}, {"step": 9000, "loss": 0.29807, "lr": 9.841792611410708e-05, "gn": 1.293}, {"step": 9200, "loss": 0.30432, "lr": 9.826580362507893e-05, "gn": 1.2507}, {"step": 9400, "loss": 0.30348, "lr": 9.811368113605075e-05, "gn": 1.253}, {"step": 9600, "loss": 0.30188, "lr": 9.796155864702258e-05, "gn": 1.2081}, {"step": 9800, "loss": 0.29772, "lr": 9.780943615799442e-05, "gn": 0.6954}, {"step": 10000, "loss": 0.29206, "lr": 9.765731366896625e-05, "gn": 1.4456}, {"step": 10200, "loss": 0.27772, "lr": 9.750519117993809e-05, "gn": 1.523}, {"step": 10400, "loss": 0.2873, "lr": 9.735306869090992e-05, "gn": 1.0448}, {"step": 10600, "loss": 0.28031, "lr": 9.720094620188176e-05, "gn": 1.4185}, {"step": 10800, "loss": 0.28022, "lr": 9.704882371285359e-05, "gn": 1.1035}, {"step": 11000, "loss": 0.27801, "lr": 9.689670122382543e-05, "gn": 0.7287}, {"step": 11200, "loss": 0.28618, "lr": 9.674457873479726e-05, "gn": 1.2982}, {"step": 11400, "loss": 0.28146, "lr": 9.65924562457691e-05, "gn": 1.0212}, {"step": 11600, "loss": 0.26983, "lr": 9.644033375674093e-05, "gn": 1.0535}, {"step": 11800, "loss": 0.27255, "lr": 9.628821126771277e-05, "gn": 0.982}, {"step": 12000, "loss": 0.26934, "lr": 9.61360887786846e-05, "gn": 0.9723}, {"step": 12200, "loss": 0.27493, "lr": 9.598396628965644e-05, "gn": 1.3002}, {"step": 12400, "loss": 0.27021, "lr": 9.583184380062827e-05, "gn": 1.3578}, {"step": 12600, "loss": 0.27458, "lr": 9.56797213116001e-05, "gn": 1.336}, {"step": 12800, "loss": 0.26977, "lr": 9.552759882257194e-05, "gn": 1.2034}, {"step": 13000, "loss": 0.2722, "lr": 9.537547633354378e-05, "gn": 1.5146}, {"step": 13200, "loss": 0.27352, "lr": 9.522335384451561e-05, "gn": 1.2852}, {"step": 13400, "loss": 0.2602, "lr": 9.507123135548745e-05, "gn": 0.77}, {"step": 13600, "loss": 0.26545, "lr": 9.491910886645927e-05, "gn": 1.3028}, {"step": 13800, "loss": 0.26735, "lr": 9.476698637743112e-05, "gn": 0.8006}, {"step": 14000, "loss": 0.2674, "lr": 9.461486388840295e-05, "gn": 0.9381}, {"step": 14200, "loss": 0.26234, "lr": 9.446274139937477e-05, "gn": 1.3799}, {"step": 14400, "loss": 0.25437, "lr": 9.431061891034662e-05, "gn": 0.9526}, {"step": 14600, "loss": 0.26042, "lr": 9.415849642131846e-05, "gn": 0.7547}, {"step": 14800, "loss": 0.26068, "lr": 9.400637393229028e-05, "gn": 1.2631}, {"step": 15000, "loss": 0.2749, "lr": 9.385425144326213e-05, "gn": 1.2168}, {"step": 15200, "loss": 0.26181, "lr": 9.370212895423396e-05, "gn": 1.1746}, {"step": 15400, "loss": 0.25181, "lr": 9.355000646520578e-05, "gn": 1.1083}, {"step": 15600, "loss": 0.26386, "lr": 9.339788397617763e-05, "gn": 0.9903}, {"step": 15800, "loss": 0.25442, "lr": 9.324576148714945e-05, "gn": 1.1839}, {"step": 16000, "loss": 0.25968, "lr": 9.309363899812129e-05, "gn": 0.9631}, {"step": 16200, "loss": 0.25567, "lr": 9.294151650909314e-05, "gn": 0.7912}, {"step": 16400, "loss": 0.24781, "lr": 9.278939402006496e-05, "gn": 0.8077}, {"step": 16600, "loss": 0.25312, "lr": 9.263727153103679e-05, "gn": 1.1516}, {"step": 16800, "loss": 0.25148, "lr": 9.248514904200864e-05, "gn": 0.9057}, {"step": 17000, "loss": 0.25151, "lr": 9.233302655298046e-05, "gn": 0.6544}, {"step": 17200, "loss": 0.24842, "lr": 9.21809040639523e-05, "gn": 0.7062}, {"step": 17400, "loss": 0.25409, "lr": 9.202878157492413e-05, "gn": 0.9445}, {"step": 17600, "loss": 0.25225, "lr": 9.187665908589597e-05, "gn": 1.0238}, {"step": 17800, "loss": 0.24872, "lr": 9.17245365968678e-05, "gn": 1.122}, {"step": 18000, "loss": 0.24935, "lr": 9.157241410783964e-05, "gn": 0.8138}, {"step": 18200, "loss": 0.24208, "lr": 9.142029161881147e-05, "gn": 0.6826}, {"step": 18400, "loss": 0.24919, "lr": 9.12681691297833e-05, "gn": 0.8328}, {"step": 18600, "loss": 0.24141, "lr": 9.111604664075514e-05, "gn": 0.8758}, {"step": 18800, "loss": 0.24293, "lr": 9.096392415172698e-05, "gn": 0.6803}, {"step": 19000, "loss": 0.23541, "lr": 9.081180166269881e-05, "gn": 1.1304}, {"step": 19200, "loss": 0.23831, "lr": 9.065967917367065e-05, "gn": 0.7293}, {"step": 19400, "loss": 0.24515, "lr": 9.050755668464248e-05, "gn": 0.9784}, {"step": 19600, "loss": 0.24001, "lr": 9.03554341956143e-05, "gn": 0.7338}, {"step": 19800, "loss": 0.23665, "lr": 9.020331170658615e-05, "gn": 0.8799}, {"step": 20000, "loss": 0.25144, "lr": 9.005118921755799e-05, "gn": 0.8691}, {"step": 20200, "loss": 0.24179, "lr": 8.989906672852981e-05, "gn": 0.726}, {"step": 20400, "loss": 0.23611, "lr": 8.974694423950166e-05, "gn": 0.8682}, {"step": 20600, "loss": 0.24397, "lr": 8.959482175047349e-05, "gn": 1.1084}, {"step": 20800, "loss": 0.22925, "lr": 8.944269926144531e-05, "gn": 0.6862}, {"step": 21000, "loss": 0.23172, "lr": 8.929057677241716e-05, "gn": 0.6969}, {"step": 21200, "loss": 0.23996, "lr": 8.9138454283389e-05, "gn": 0.9787}, {"step": 21400, "loss": 0.24622, "lr": 8.898633179436082e-05, "gn": 1.0043}, {"step": 21600, "loss": 0.23439, "lr": 8.883420930533267e-05, "gn": 0.6716}, {"step": 21800, "loss": 0.23441, "lr": 8.868208681630449e-05, "gn": 0.8124}, {"step": 22000, "loss": 0.23398, "lr": 8.852996432727632e-05, "gn": 0.7101}, {"step": 22200, "loss": 0.24242, "lr": 8.837784183824817e-05, "gn": 1.2101}, {"step": 22400, "loss": 0.23918, "lr": 8.822571934921999e-05, "gn": 0.7962}, {"step": 22600, "loss": 0.23855, "lr": 8.807359686019183e-05, "gn": 0.7466}, {"step": 22800, "loss": 0.2353, "lr": 8.792147437116368e-05, "gn": 0.8358}, {"step": 23000, "loss": 0.2368, "lr": 8.77693518821355e-05, "gn": 0.9871}, {"step": 23200, "loss": 0.2364, "lr": 8.761722939310733e-05, "gn": 0.8176}, {"step": 23400, "loss": 0.23101, "lr": 8.746510690407917e-05, "gn": 0.9218}, {"step": 23600, "loss": 0.24139, "lr": 8.7312984415051e-05, "gn": 0.7229}, {"step": 23800, "loss": 0.23195, "lr": 8.716086192602284e-05, "gn": 0.6424}, {"step": 24000, "loss": 0.23004, "lr": 8.700873943699467e-05, "gn": 1.5614}, {"step": 24200, "loss": 0.22986, "lr": 8.68566169479665e-05, "gn": 0.7466}, {"step": 24400, "loss": 0.23895, "lr": 8.670449445893834e-05, "gn": 0.8532}, {"step": 24600, "loss": 0.23202, "lr": 8.655237196991018e-05, "gn": 1.0343}, {"step": 24800, "loss": 0.23112, "lr": 8.640024948088201e-05, "gn": 1.598}, {"step": 25000, "loss": 0.24169, "lr": 8.624812699185385e-05, "gn": 0.9667}, {"step": 25200, "loss": 0.2297, "lr": 8.609600450282568e-05, "gn": 0.8069}, {"step": 25400, "loss": 0.23529, "lr": 8.594388201379752e-05, "gn": 0.656}, {"step": 25600, "loss": 0.2282, "lr": 8.579175952476934e-05, "gn": 0.5602}, {"step": 25800, "loss": 0.23217, "lr": 8.563963703574119e-05, "gn": 1.1008}, {"step": 26000, "loss": 0.22628, "lr": 8.548751454671302e-05, "gn": 0.6908}, {"step": 26200, "loss": 0.23403, "lr": 8.533539205768484e-05, "gn": 0.7399}, {"step": 26400, "loss": 0.22321, "lr": 8.518326956865669e-05, "gn": 0.8985}, {"step": 26600, "loss": 0.22443, "lr": 8.503114707962853e-05, "gn": 0.9199}, {"step": 26800, "loss": 0.23546, "lr": 8.487902459060035e-05, "gn": 0.8582}, {"step": 27000, "loss": 0.23066, "lr": 8.47269021015722e-05, "gn": 0.7202}, {"step": 27200, "loss": 0.23235, "lr": 8.457477961254402e-05, "gn": 0.818}, {"step": 27400, "loss": 0.23169, "lr": 8.442265712351585e-05, "gn": 0.8034}, {"step": 27600, "loss": 0.22132, "lr": 8.42705346344877e-05, "gn": 0.8771}, {"step": 27800, "loss": 0.22643, "lr": 8.411841214545952e-05, "gn": 0.7261}, {"step": 28000, "loss": 0.23338, "lr": 8.396628965643136e-05, "gn": 0.9204}, {"step": 28200, "loss": 0.23201, "lr": 8.38141671674032e-05, "gn": 0.8333}, {"step": 28400, "loss": 0.23577, "lr": 8.366204467837503e-05, "gn": 0.6159}, {"step": 28600, "loss": 0.23158, "lr": 8.350992218934686e-05, "gn": 0.4876}, {"step": 28800, "loss": 0.22174, "lr": 8.335779970031871e-05, "gn": 0.7287}, {"step": 29000, "loss": 0.23147, "lr": 8.320567721129053e-05, "gn": 1.1069}, {"step": 29200, "loss": 0.2309, "lr": 8.305355472226237e-05, "gn": 0.8135}, {"step": 29400, "loss": 0.23127, "lr": 8.29014322332342e-05, "gn": 0.5916}, {"step": 29600, "loss": 0.22401, "lr": 8.274930974420604e-05, "gn": 0.7132}, {"step": 29800, "loss": 0.2218, "lr": 8.259718725517787e-05, "gn": 1.1196}, {"step": 30000, "loss": 0.22137, "lr": 8.24450647661497e-05, "gn": 0.6391}, {"step": 30200, "loss": 0.22156, "lr": 8.229294227712154e-05, "gn": 0.8577}, {"step": 30400, "loss": 0.22656, "lr": 8.214081978809338e-05, "gn": 0.5854}, {"step": 30600, "loss": 0.22613, "lr": 8.198869729906521e-05, "gn": 0.465}, {"step": 30800, "loss": 0.2264, "lr": 8.183657481003705e-05, "gn": 0.8078}, {"step": 31000, "loss": 0.22122, "lr": 8.168445232100888e-05, "gn": 1.1218}, {"step": 31200, "loss": 0.22807, "lr": 8.153232983198072e-05, "gn": 0.783}, {"step": 31400, "loss": 0.22524, "lr": 8.138020734295255e-05, "gn": 0.5722}, {"step": 31600, "loss": 0.22213, "lr": 8.122808485392439e-05, "gn": 0.8141}, {"step": 31800, "loss": 0.22629, "lr": 8.107596236489622e-05, "gn": 0.7061}, {"step": 32000, "loss": 0.22057, "lr": 8.092383987586806e-05, "gn": 1.0165}, {"step": 32200, "loss": 0.23032, "lr": 8.077171738683989e-05, "gn": 0.9391}, {"step": 32400, "loss": 0.22113, "lr": 8.061959489781173e-05, "gn": 0.6987}, {"step": 32600, "loss": 0.22804, "lr": 8.046747240878356e-05, "gn": 0.9101}, {"step": 32800, "loss": 0.22267, "lr": 8.03153499197554e-05, "gn": 0.9799}, {"step": 33000, "loss": 0.22527, "lr": 8.016322743072723e-05, "gn": 0.7735}, {"step": 33200, "loss": 0.22521, "lr": 8.001110494169905e-05, "gn": 0.9794}, {"step": 33400, "loss": 0.21822, "lr": 7.98589824526709e-05, "gn": 0.9644}, {"step": 33600, "loss": 0.22982, "lr": 7.970685996364274e-05, "gn": 0.6489}, {"step": 33800, "loss": 0.22721, "lr": 7.955473747461456e-05, "gn": 0.5719}, {"step": 34000, "loss": 0.22343, "lr": 7.94026149855864e-05, "gn": 0.8597}, {"step": 34200, "loss": 0.21853, "lr": 7.925049249655824e-05, "gn": 0.7422}, {"step": 34400, "loss": 0.22025, "lr": 7.909837000753006e-05, "gn": 0.9681}, {"step": 34600, "loss": 0.2223, "lr": 7.894624751850191e-05, "gn": 1.128}, {"step": 34800, "loss": 0.21429, "lr": 7.879412502947373e-05, "gn": 0.7802}, {"step": 35000, "loss": 0.21882, "lr": 7.864200254044557e-05, "gn": 0.8818}, {"step": 35200, "loss": 0.22382, "lr": 7.848988005141741e-05, "gn": 0.895}, {"step": 35400, "loss": 0.21987, "lr": 7.833775756238924e-05, "gn": 0.8701}, {"step": 35600, "loss": 0.22261, "lr": 7.818563507336107e-05, "gn": 1.0387}, {"step": 35800, "loss": 0.22902, "lr": 7.803351258433292e-05, "gn": 0.7661}, {"step": 36000, "loss": 0.23323, "lr": 7.788139009530474e-05, "gn": 0.695}, {"step": 36200, "loss": 0.22056, "lr": 7.772926760627658e-05, "gn": 0.6983}, {"step": 36400, "loss": 0.22359, "lr": 7.757714511724842e-05, "gn": 0.7036}, {"step": 36600, "loss": 0.22212, "lr": 7.742502262822025e-05, "gn": 0.7291}, {"step": 36800, "loss": 0.21504, "lr": 7.727290013919208e-05, "gn": 0.9837}, {"step": 37000, "loss": 0.22238, "lr": 7.712077765016392e-05, "gn": 0.7787}, {"step": 37200, "loss": 0.22152, "lr": 7.696865516113575e-05, "gn": 0.5634}, {"step": 37400, "loss": 0.22294, "lr": 7.681653267210759e-05, "gn": 0.7447}, {"step": 37600, "loss": 0.22237, "lr": 7.666441018307942e-05, "gn": 0.5705}, {"step": 37800, "loss": 0.2196, "lr": 7.651228769405126e-05, "gn": 0.9011}, {"step": 38000, "loss": 0.21858, "lr": 7.636016520502309e-05, "gn": 0.818}, {"step": 38200, "loss": 0.22293, "lr": 7.620804271599493e-05, "gn": 0.5389}, {"step": 38400, "loss": 0.22205, "lr": 7.605592022696676e-05, "gn": 0.5878}, {"step": 38600, "loss": 0.21892, "lr": 7.590379773793858e-05, "gn": 0.4471}, {"step": 38800, "loss": 0.21492, "lr": 7.575167524891043e-05, "gn": 0.5458}, {"step": 39000, "loss": 0.22059, "lr": 7.559955275988227e-05, "gn": 0.6798}, {"step": 39200, "loss": 0.22359, "lr": 7.544743027085409e-05, "gn": 1.4037}, {"step": 39400, "loss": 0.21165, "lr": 7.529530778182593e-05, "gn": 0.5759}, {"step": 39600, "loss": 0.22365, "lr": 7.514318529279777e-05, "gn": 0.7292}, {"step": 39800, "loss": 0.2165, "lr": 7.499106280376959e-05, "gn": 0.5579}, {"step": 40000, "loss": 0.22393, "lr": 7.483894031474144e-05, "gn": 0.7936}, {"step": 40200, "loss": 0.22066, "lr": 7.468681782571327e-05, "gn": 0.5977}, {"step": 40400, "loss": 0.22441, "lr": 7.45346953366851e-05, "gn": 0.6013}, {"step": 40600, "loss": 0.21518, "lr": 7.438257284765694e-05, "gn": 0.542}, {"step": 40800, "loss": 0.21427, "lr": 7.423045035862877e-05, "gn": 0.6182}, {"step": 41000, "loss": 0.21817, "lr": 7.40783278696006e-05, "gn": 0.8932}, {"step": 41200, "loss": 0.22322, "lr": 7.392620538057245e-05, "gn": 0.8037}, {"step": 41400, "loss": 0.21406, "lr": 7.377408289154427e-05, "gn": 0.6156}, {"step": 41600, "loss": 0.21842, "lr": 7.36219604025161e-05, "gn": 0.8194}, {"step": 41800, "loss": 0.21828, "lr": 7.346983791348795e-05, "gn": 0.7492}, {"step": 42000, "loss": 0.21546, "lr": 7.331771542445978e-05, "gn": 0.6373}, {"step": 42200, "loss": 0.21626, "lr": 7.316559293543161e-05, "gn": 0.7576}, {"step": 42400, "loss": 0.20986, "lr": 7.301347044640345e-05, "gn": 0.4587}, {"step": 42600, "loss": 0.21807, "lr": 7.286134795737528e-05, "gn": 0.808}, {"step": 42800, "loss": 0.22035, "lr": 7.270922546834712e-05, "gn": 0.5991}, {"step": 43000, "loss": 0.21864, "lr": 7.255710297931895e-05, "gn": 1.1105}, {"step": 43200, "loss": 0.22178, "lr": 7.240498049029079e-05, "gn": 0.6745}, {"step": 43400, "loss": 0.21841, "lr": 7.225285800126262e-05, "gn": 0.9132}, {"step": 43600, "loss": 0.21278, "lr": 7.210073551223446e-05, "gn": 0.8179}, {"step": 43800, "loss": 0.21897, "lr": 7.194861302320629e-05, "gn": 0.7349}, {"step": 44000, "loss": 0.21672, "lr": 7.179649053417813e-05, "gn": 0.8313}, {"step": 44200, "loss": 0.21383, "lr": 7.164436804514996e-05, "gn": 0.769}, {"step": 44400, "loss": 0.21411, "lr": 7.14922455561218e-05, "gn": 0.5998}, {"step": 44600, "loss": 0.22185, "lr": 7.134012306709362e-05, "gn": 0.6399}, {"step": 44800, "loss": 0.21158, "lr": 7.118800057806546e-05, "gn": 0.6608}, {"step": 45000, "loss": 0.21795, "lr": 7.10358780890373e-05, "gn": 1.0331}, {"step": 45200, "loss": 0.20859, "lr": 7.088375560000912e-05, "gn": 0.5425}, {"step": 45400, "loss": 0.21815, "lr": 7.073163311098097e-05, "gn": 0.687}, {"step": 45600, "loss": 0.22231, "lr": 7.05795106219528e-05, "gn": 0.6488}, {"step": 45800, "loss": 0.21865, "lr": 7.042738813292463e-05, "gn": 0.7086}, {"step": 46000, "loss": 0.20458, "lr": 7.027526564389647e-05, "gn": 0.6023}, {"step": 46200, "loss": 0.21044, "lr": 7.01231431548683e-05, "gn": 0.7837}, {"step": 46400, "loss": 0.21416, "lr": 6.997102066584013e-05, "gn": 0.4676}, {"step": 46600, "loss": 0.21769, "lr": 6.981889817681198e-05, "gn": 0.5403}, {"step": 46800, "loss": 0.21213, "lr": 6.96667756877838e-05, "gn": 0.868}, {"step": 47000, "loss": 0.2164, "lr": 6.951465319875564e-05, "gn": 0.6924}, {"step": 47200, "loss": 0.21879, "lr": 6.936253070972748e-05, "gn": 0.7701}, {"step": 47400, "loss": 0.2139, "lr": 6.92104082206993e-05, "gn": 1.0193}, {"step": 47600, "loss": 0.21787, "lr": 6.905828573167114e-05, "gn": 1.116}, {"step": 47800, "loss": 0.21195, "lr": 6.890616324264299e-05, "gn": 0.6556}, {"step": 48000, "loss": 0.20755, "lr": 6.875404075361481e-05, "gn": 0.5772}, {"step": 48200, "loss": 0.21745, "lr": 6.860191826458665e-05, "gn": 0.6016}, {"step": 48400, "loss": 0.21678, "lr": 6.844979577555848e-05, "gn": 0.8383}, {"step": 48600, "loss": 0.21397, "lr": 6.829767328653032e-05, "gn": 0.4567}, {"step": 48800, "loss": 0.21429, "lr": 6.814555079750215e-05, "gn": 0.5928}, {"step": 49000, "loss": 0.2148, "lr": 6.799342830847399e-05, "gn": 0.6007}, {"step": 49200, "loss": 0.21463, "lr": 6.784130581944582e-05, "gn": 0.5945}, {"step": 49400, "loss": 0.22315, "lr": 6.768918333041766e-05, "gn": 0.8243}, {"step": 49600, "loss": 0.21678, "lr": 6.753706084138949e-05, "gn": 0.8247}, {"step": 49800, "loss": 0.21151, "lr": 6.738493835236133e-05, "gn": 0.5731}, {"step": 50000, "loss": 0.21744, "lr": 6.723281586333316e-05, "gn": 0.6398}, {"step": 50200, "loss": 0.20915, "lr": 6.7080693374305e-05, "gn": 0.7832}, {"step": 50400, "loss": 0.2108, "lr": 6.692857088527683e-05, "gn": 0.6344}, {"step": 50600, "loss": 0.20727, "lr": 6.677644839624866e-05, "gn": 0.5656}, {"step": 50800, "loss": 0.21095, "lr": 6.66243259072205e-05, "gn": 0.5987}, {"step": 51000, "loss": 0.20374, "lr": 6.647220341819233e-05, "gn": 0.6448}, {"step": 51200, "loss": 0.21546, "lr": 6.632008092916417e-05, "gn": 0.5708}, {"step": 51400, "loss": 0.2166, "lr": 6.6167958440136e-05, "gn": 0.5151}, {"step": 51600, "loss": 0.21734, "lr": 6.601583595110784e-05, "gn": 0.5731}, {"step": 51800, "loss": 0.22029, "lr": 6.586371346207967e-05, "gn": 0.6086}, {"step": 52000, "loss": 0.21645, "lr": 6.571159097305151e-05, "gn": 0.6071}, {"step": 52200, "loss": 0.20014, "lr": 6.555946848402333e-05, "gn": 0.503}, {"step": 52400, "loss": 0.20922, "lr": 6.540734599499518e-05, "gn": 0.6784}, {"step": 52600, "loss": 0.21513, "lr": 6.525522350596701e-05, "gn": 0.8829}, {"step": 52800, "loss": 0.21539, "lr": 6.510310101693884e-05, "gn": 0.7344}, {"step": 53000, "loss": 0.21674, "lr": 6.495097852791068e-05, "gn": 0.5512}, {"step": 53200, "loss": 0.21399, "lr": 6.479885603888252e-05, "gn": 0.528}, {"step": 53400, "loss": 0.20976, "lr": 6.464673354985434e-05, "gn": 0.5953}, {"step": 53600, "loss": 0.21346, "lr": 6.449461106082618e-05, "gn": 0.7155}, {"step": 53800, "loss": 0.21822, "lr": 6.434248857179801e-05, "gn": 0.4302}, {"step": 54000, "loss": 0.21247, "lr": 6.419036608276985e-05, "gn": 0.6421}, {"step": 54200, "loss": 0.20768, "lr": 6.403824359374168e-05, "gn": 0.5916}, {"step": 54400, "loss": 0.2015, "lr": 6.388612110471352e-05, "gn": 0.4724}, {"step": 54600, "loss": 0.21109, "lr": 6.373399861568535e-05, "gn": 0.6795}, {"step": 54800, "loss": 0.21233, "lr": 6.358187612665719e-05, "gn": 0.6668}, {"step": 55000, "loss": 0.2125, "lr": 6.342975363762902e-05, "gn": 0.5731}, {"step": 55200, "loss": 0.20904, "lr": 6.327763114860086e-05, "gn": 0.6057}, {"step": 55400, "loss": 0.21749, "lr": 6.312550865957269e-05, "gn": 0.8946}, {"step": 55600, "loss": 0.20581, "lr": 6.297338617054452e-05, "gn": 0.5198}, {"step": 55800, "loss": 0.21163, "lr": 6.282126368151636e-05, "gn": 0.8263}, {"step": 56000, "loss": 0.21187, "lr": 6.26691411924882e-05, "gn": 0.7035}, {"step": 56200, "loss": 0.21497, "lr": 6.251701870346003e-05, "gn": 0.817}, {"step": 56400, "loss": 0.21746, "lr": 6.236489621443186e-05, "gn": 0.5656}, {"step": 56600, "loss": 0.20646, "lr": 6.22127737254037e-05, "gn": 0.556}, {"step": 56800, "loss": 0.21248, "lr": 6.206065123637553e-05, "gn": 0.5689}, {"step": 57000, "loss": 0.21102, "lr": 6.190852874734737e-05, "gn": 0.8303}, {"step": 57200, "loss": 0.20974, "lr": 6.17564062583192e-05, "gn": 0.3618}, {"step": 57400, "loss": 0.20964, "lr": 6.160428376929104e-05, "gn": 0.4499}, {"step": 57600, "loss": 0.20595, "lr": 6.145216128026286e-05, "gn": 0.5064}, {"step": 57800, "loss": 0.2159, "lr": 6.130003879123471e-05, "gn": 0.7848}, {"step": 58000, "loss": 0.20676, "lr": 6.114791630220654e-05, "gn": 0.6302}, {"step": 58200, "loss": 0.20252, "lr": 6.099579381317837e-05, "gn": 0.908}, {"step": 58400, "loss": 0.20822, "lr": 6.084367132415021e-05, "gn": 0.5481}, {"step": 58600, "loss": 0.21211, "lr": 6.069154883512205e-05, "gn": 0.5612}, {"step": 58800, "loss": 0.21429, "lr": 6.053942634609388e-05, "gn": 0.6531}, {"step": 59000, "loss": 0.20916, "lr": 6.038730385706571e-05, "gn": 0.7283}, {"step": 59200, "loss": 0.21819, "lr": 6.0235181368037554e-05, "gn": 0.6229}, {"step": 59400, "loss": 0.20684, "lr": 6.008305887900938e-05, "gn": 0.8426}, {"step": 59600, "loss": 0.21019, "lr": 5.993093638998122e-05, "gn": 0.524}, {"step": 59800, "loss": 0.20439, "lr": 5.9778813900953045e-05, "gn": 0.5311}, {"step": 60000, "loss": 0.21263, "lr": 5.962669141192489e-05, "gn": 0.7171}, {"step": 60200, "loss": 0.21664, "lr": 5.947456892289672e-05, "gn": 0.3971}, {"step": 60400, "loss": 0.21287, "lr": 5.932244643386855e-05, "gn": 0.4589}, {"step": 60600, "loss": 0.20666, "lr": 5.917032394484039e-05, "gn": 0.6324}, {"step": 60800, "loss": 0.19698, "lr": 5.901820145581223e-05, "gn": 0.5697}, {"step": 61000, "loss": 0.20939, "lr": 5.8866078966784055e-05, "gn": 0.8023}, {"step": 61200, "loss": 0.21306, "lr": 5.87139564777559e-05, "gn": 0.459}, {"step": 61400, "loss": 0.20791, "lr": 5.856183398872772e-05, "gn": 0.4193}, {"step": 61600, "loss": 0.21108, "lr": 5.840971149969956e-05, "gn": 0.7662}, {"step": 61800, "loss": 0.20847, "lr": 5.82575890106714e-05, "gn": 0.5747}, {"step": 62000, "loss": 0.20297, "lr": 5.810546652164322e-05, "gn": 0.651}, {"step": 62200, "loss": 0.20419, "lr": 5.7953344032615065e-05, "gn": 0.5827}, {"step": 62400, "loss": 0.20925, "lr": 5.7801221543586906e-05, "gn": 0.7862}, {"step": 62600, "loss": 0.20441, "lr": 5.764909905455873e-05, "gn": 0.6069}, {"step": 62800, "loss": 0.20932, "lr": 5.749697656553057e-05, "gn": 0.6364}, {"step": 63000, "loss": 0.21867, "lr": 5.734485407650241e-05, "gn": 0.971}, {"step": 63200, "loss": 0.20856, "lr": 5.719273158747423e-05, "gn": 0.3927}, {"step": 63400, "loss": 0.20547, "lr": 5.7040609098446074e-05, "gn": 0.728}, {"step": 63600, "loss": 0.21431, "lr": 5.68884866094179e-05, "gn": 0.4838}, {"step": 63800, "loss": 0.20796, "lr": 5.673636412038974e-05, "gn": 0.7648}, {"step": 64000, "loss": 0.21381, "lr": 5.658424163136158e-05, "gn": 0.6206}, {"step": 64200, "loss": 0.20728, "lr": 5.643211914233341e-05, "gn": 0.5352}, {"step": 64400, "loss": 0.2092, "lr": 5.627999665330524e-05, "gn": 0.4304}, {"step": 64600, "loss": 0.20641, "lr": 5.6127874164277084e-05, "gn": 0.7655}, {"step": 64800, "loss": 0.21348, "lr": 5.597575167524891e-05, "gn": 0.4715}, {"step": 65000, "loss": 0.20826, "lr": 5.582362918622075e-05, "gn": 0.6797}, {"step": 65200, "loss": 0.20804, "lr": 5.5671506697192575e-05, "gn": 0.4895}, {"step": 65400, "loss": 0.21268, "lr": 5.551938420816442e-05, "gn": 0.6251}, {"step": 65600, "loss": 0.21235, "lr": 5.536726171913625e-05, "gn": 0.4672}, {"step": 65800, "loss": 0.20219, "lr": 5.521513923010808e-05, "gn": 0.3949}, {"step": 66000, "loss": 0.21099, "lr": 5.506301674107992e-05, "gn": 0.9294}, {"step": 66200, "loss": 0.20467, "lr": 5.491089425205176e-05, "gn": 0.5634}, {"step": 66400, "loss": 0.21673, "lr": 5.4758771763023585e-05, "gn": 0.7335}, {"step": 66600, "loss": 0.20512, "lr": 5.4606649273995427e-05, "gn": 0.4949}, {"step": 66800, "loss": 0.20239, "lr": 5.445452678496726e-05, "gn": 0.3252}, {"step": 67000, "loss": 0.2002, "lr": 5.430240429593909e-05, "gn": 0.636}, {"step": 67200, "loss": 0.20985, "lr": 5.415028180691093e-05, "gn": 0.9017}, {"step": 67400, "loss": 0.21071, "lr": 5.399815931788276e-05, "gn": 0.6479}, {"step": 67600, "loss": 0.20923, "lr": 5.3846036828854595e-05, "gn": 0.7749}, {"step": 67800, "loss": 0.21354, "lr": 5.3693914339826436e-05, "gn": 0.8262}, {"step": 68000, "loss": 0.20531, "lr": 5.3541791850798264e-05, "gn": 0.5813}, {"step": 68200, "loss": 0.21289, "lr": 5.33896693617701e-05, "gn": 1.0366}, {"step": 68400, "loss": 0.2139, "lr": 5.323754687274194e-05, "gn": 0.3788}, {"step": 68600, "loss": 0.21042, "lr": 5.308542438371377e-05, "gn": 0.556}, {"step": 68800, "loss": 0.20175, "lr": 5.2933301894685604e-05, "gn": 0.4731}, {"step": 69000, "loss": 0.20441, "lr": 5.278117940565743e-05, "gn": 0.6536}, {"step": 69200, "loss": 0.20788, "lr": 5.2629056916629274e-05, "gn": 0.8039}, {"step": 69400, "loss": 0.21005, "lr": 5.247693442760111e-05, "gn": 0.7981}, {"step": 69600, "loss": 0.2057, "lr": 5.232481193857294e-05, "gn": 0.8152}, {"step": 69800, "loss": 0.20287, "lr": 5.217268944954478e-05, "gn": 0.4894}, {"step": 70000, "loss": 0.20605, "lr": 5.2020566960516614e-05, "gn": 0.5027}, {"step": 70200, "loss": 0.20747, "lr": 5.186844447148844e-05, "gn": 0.4263}, {"step": 70400, "loss": 0.21506, "lr": 5.1716321982460284e-05, "gn": 0.7641}, {"step": 70600, "loss": 0.20614, "lr": 5.156419949343212e-05, "gn": 0.6046}, {"step": 70800, "loss": 0.20786, "lr": 5.141207700440395e-05, "gn": 0.6775}, {"step": 71000, "loss": 0.20515, "lr": 5.125995451537579e-05, "gn": 0.718}, {"step": 71200, "loss": 0.21405, "lr": 5.110783202634761e-05, "gn": 0.6673}, {"step": 71400, "loss": 0.20394, "lr": 5.095570953731945e-05, "gn": 0.5853}, {"step": 71600, "loss": 0.20922, "lr": 5.0803587048291293e-05, "gn": 0.6711}, {"step": 71800, "loss": 0.20328, "lr": 5.0651464559263115e-05, "gn": 1.3038}, {"step": 72000, "loss": 0.21172, "lr": 5.0499342070234957e-05, "gn": 0.4986}, {"step": 72200, "loss": 0.20929, "lr": 5.034721958120679e-05, "gn": 0.6091}, {"step": 72400, "loss": 0.2044, "lr": 5.019509709217862e-05, "gn": 0.2862}, {"step": 72600, "loss": 0.20179, "lr": 5.004297460315046e-05, "gn": 0.5818}, {"step": 72800, "loss": 0.20431, "lr": 4.9890852114122296e-05, "gn": 0.3607}, {"step": 73000, "loss": 0.19757, "lr": 4.9738729625094125e-05, "gn": 0.4265}, {"step": 73200, "loss": 0.20917, "lr": 4.958660713606596e-05, "gn": 0.6119}, {"step": 73400, "loss": 0.21102, "lr": 4.94344846470378e-05, "gn": 0.7564}, {"step": 73600, "loss": 0.20987, "lr": 4.928236215800963e-05, "gn": 0.7056}, {"step": 73800, "loss": 0.21174, "lr": 4.9130239668981464e-05, "gn": 0.5618}, {"step": 74000, "loss": 0.20838, "lr": 4.8978117179953306e-05, "gn": 0.6308}, {"step": 74200, "loss": 0.20255, "lr": 4.8825994690925134e-05, "gn": 0.5123}, {"step": 74400, "loss": 0.20783, "lr": 4.867387220189697e-05, "gn": 0.4528}, {"step": 74600, "loss": 0.2135, "lr": 4.8521749712868804e-05, "gn": 0.5329}, {"step": 74800, "loss": 0.20648, "lr": 4.836962722384064e-05, "gn": 0.5893}, {"step": 75000, "loss": 0.20684, "lr": 4.8217504734812474e-05, "gn": 0.5315}, {"step": 75200, "loss": 0.20992, "lr": 4.806538224578431e-05, "gn": 0.7822}, {"step": 75400, "loss": 0.21488, "lr": 4.791325975675614e-05, "gn": 1.4384}, {"step": 75600, "loss": 0.20522, "lr": 4.776113726772798e-05, "gn": 0.3725}, {"step": 75800, "loss": 0.21464, "lr": 4.7609014778699814e-05, "gn": 0.54}, {"step": 76000, "loss": 0.21044, "lr": 4.745689228967164e-05, "gn": 0.5741}, {"step": 76200, "loss": 0.21035, "lr": 4.730476980064348e-05, "gn": 0.5246}, {"step": 76400, "loss": 0.21525, "lr": 4.715264731161532e-05, "gn": 0.7292}, {"step": 76600, "loss": 0.20574, "lr": 4.700052482258715e-05, "gn": 0.67}, {"step": 76800, "loss": 0.19563, "lr": 4.684840233355898e-05, "gn": 0.3464}, {"step": 77000, "loss": 0.20498, "lr": 4.669627984453082e-05, "gn": 0.4462}, {"step": 77200, "loss": 0.2129, "lr": 4.654415735550265e-05, "gn": 1.6693}, {"step": 77400, "loss": 0.20609, "lr": 4.6392034866474487e-05, "gn": 0.6881}, {"step": 77600, "loss": 0.21126, "lr": 4.623991237744632e-05, "gn": 0.6839}, {"step": 77800, "loss": 0.2082, "lr": 4.6087789888418156e-05, "gn": 1.0654}, {"step": 78000, "loss": 0.20013, "lr": 4.593566739938999e-05, "gn": 0.2893}, {"step": 78200, "loss": 0.20527, "lr": 4.5783544910361826e-05, "gn": 0.542}, {"step": 78400, "loss": 0.20461, "lr": 4.563142242133366e-05, "gn": 0.4883}, {"step": 78600, "loss": 0.20768, "lr": 4.5479299932305496e-05, "gn": 0.6773}, {"step": 78800, "loss": 0.21032, "lr": 4.532717744327733e-05, "gn": 0.3591}, {"step": 79000, "loss": 0.20857, "lr": 4.5175054954249166e-05, "gn": 0.5533}, {"step": 79200, "loss": 0.21011, "lr": 4.5022932465220994e-05, "gn": 0.3938}, {"step": 79400, "loss": 0.20666, "lr": 4.4870809976192836e-05, "gn": 0.5486}, {"step": 79600, "loss": 0.19954, "lr": 4.471868748716467e-05, "gn": 0.5686}, {"step": 79800, "loss": 0.21064, "lr": 4.45665649981365e-05, "gn": 0.6747}, {"step": 80000, "loss": 0.19761, "lr": 4.4414442509108334e-05, "gn": 0.6242}, {"step": 80200, "loss": 0.20241, "lr": 4.426232002008017e-05, "gn": 0.4248}, {"step": 80400, "loss": 0.20657, "lr": 4.4110197531052004e-05, "gn": 0.5376}, {"step": 80600, "loss": 0.20749, "lr": 4.395807504202384e-05, "gn": 0.6306}, {"step": 80800, "loss": 0.20282, "lr": 4.3805952552995674e-05, "gn": 0.5852}, {"step": 81000, "loss": 0.20974, "lr": 4.365383006396751e-05, "gn": 0.5012}, {"step": 81200, "loss": 0.20695, "lr": 4.3501707574939344e-05, "gn": 0.413}, {"step": 81400, "loss": 0.19759, "lr": 4.334958508591118e-05, "gn": 0.4694}, {"step": 81600, "loss": 0.20155, "lr": 4.3197462596883014e-05, "gn": 0.7349}, {"step": 81800, "loss": 0.20621, "lr": 4.304534010785485e-05, "gn": 0.5302}, {"step": 82000, "loss": 0.20686, "lr": 4.2893217618826684e-05, "gn": 0.4969}, {"step": 82200, "loss": 0.20751, "lr": 4.274109512979851e-05, "gn": 0.6273}, {"step": 82400, "loss": 0.20404, "lr": 4.2588972640770353e-05, "gn": 0.5335}, {"step": 82600, "loss": 0.20858, "lr": 4.243685015174219e-05, "gn": 0.5284}, {"step": 82800, "loss": 0.21073, "lr": 4.2284727662714017e-05, "gn": 0.494}, {"step": 83000, "loss": 0.20689, "lr": 4.213260517368585e-05, "gn": 0.571}, {"step": 83200, "loss": 0.19859, "lr": 4.198048268465769e-05, "gn": 0.8263}, {"step": 83400, "loss": 0.20941, "lr": 4.182836019562952e-05, "gn": 0.4934}, {"step": 83600, "loss": 0.20272, "lr": 4.1676237706601356e-05, "gn": 0.6049}, {"step": 83800, "loss": 0.20885, "lr": 4.152411521757319e-05, "gn": 0.5962}, {"step": 84000, "loss": 0.20461, "lr": 4.1371992728545026e-05, "gn": 0.6279}, {"step": 84200, "loss": 0.19682, "lr": 4.121987023951686e-05, "gn": 0.6178}, {"step": 84400, "loss": 0.2065, "lr": 4.1067747750488696e-05, "gn": 0.4729}, {"step": 84600, "loss": 0.20283, "lr": 4.0915625261460524e-05, "gn": 0.4259}, {"step": 84800, "loss": 0.20716, "lr": 4.0763502772432366e-05, "gn": 0.4759}, {"step": 85000, "loss": 0.20843, "lr": 4.06113802834042e-05, "gn": 0.3856}, {"step": 85200, "loss": 0.20444, "lr": 4.045925779437603e-05, "gn": 0.5986}, {"step": 85400, "loss": 0.20707, "lr": 4.030713530534787e-05, "gn": 0.4093}, {"step": 85600, "loss": 0.21347, "lr": 4.0155012816319706e-05, "gn": 0.695}, {"step": 85800, "loss": 0.20545, "lr": 4.0002890327291534e-05, "gn": 0.3553}, {"step": 86000, "loss": 0.20555, "lr": 3.985076783826337e-05, "gn": 0.4569}, {"step": 86200, "loss": 0.20865, "lr": 3.969864534923521e-05, "gn": 0.4768}, {"step": 86400, "loss": 0.20794, "lr": 3.954652286020704e-05, "gn": 0.6142}, {"step": 86600, "loss": 0.21058, "lr": 3.9394400371178874e-05, "gn": 0.6312}, {"step": 86800, "loss": 0.20167, "lr": 3.924227788215071e-05, "gn": 0.7747}, {"step": 87000, "loss": 0.19963, "lr": 3.9090155393122544e-05, "gn": 0.4506}, {"step": 87200, "loss": 0.20314, "lr": 3.893803290409438e-05, "gn": 0.5879}, {"step": 87400, "loss": 0.19919, "lr": 3.8785910415066214e-05, "gn": 0.5984}, {"step": 87600, "loss": 0.20751, "lr": 3.863378792603805e-05, "gn": 0.7747}, {"step": 87800, "loss": 0.19907, "lr": 3.8481665437009883e-05, "gn": 0.7579}, {"step": 88000, "loss": 0.20274, "lr": 3.832954294798172e-05, "gn": 0.4738}, {"step": 88200, "loss": 0.20274, "lr": 3.817742045895355e-05, "gn": 0.7023}, {"step": 88400, "loss": 0.20769, "lr": 3.802529796992538e-05, "gn": 0.587}, {"step": 88600, "loss": 0.20108, "lr": 3.787317548089722e-05, "gn": 0.6351}, {"step": 88800, "loss": 0.20453, "lr": 3.772105299186905e-05, "gn": 0.6293}, {"step": 89000, "loss": 0.20002, "lr": 3.7568930502840886e-05, "gn": 0.7469}, {"step": 89200, "loss": 0.20686, "lr": 3.741680801381273e-05, "gn": 0.497}, {"step": 89400, "loss": 0.2017, "lr": 3.7264685524784556e-05, "gn": 0.8357}, {"step": 89600, "loss": 0.20707, "lr": 3.711256303575639e-05, "gn": 0.7154}, {"step": 89800, "loss": 0.20438, "lr": 3.6960440546728226e-05, "gn": 0.5119}, {"step": 90000, "loss": 0.21309, "lr": 3.680831805770006e-05, "gn": 0.5139}, {"step": 90200, "loss": 0.20971, "lr": 3.6656195568671896e-05, "gn": 0.5138}, {"step": 90400, "loss": 0.2017, "lr": 3.650407307964373e-05, "gn": 0.6948}, {"step": 90600, "loss": 0.19874, "lr": 3.6351950590615566e-05, "gn": 0.542}, {"step": 90800, "loss": 0.20071, "lr": 3.61998281015874e-05, "gn": 0.5833}, {"step": 91000, "loss": 0.20359, "lr": 3.6047705612559236e-05, "gn": 0.5399}, {"step": 91200, "loss": 0.20275, "lr": 3.589558312353107e-05, "gn": 0.8484}, {"step": 91400, "loss": 0.20667, "lr": 3.57434606345029e-05, "gn": 0.4388}, {"step": 91600, "loss": 0.20714, "lr": 3.559133814547474e-05, "gn": 0.9581}, {"step": 91800, "loss": 0.19687, "lr": 3.5439215656446576e-05, "gn": 0.7247}, {"step": 92000, "loss": 0.20123, "lr": 3.5287093167418404e-05, "gn": 0.6754}, {"step": 92200, "loss": 0.1975, "lr": 3.513497067839024e-05, "gn": 0.5083}, {"step": 92400, "loss": 0.19682, "lr": 3.498284818936208e-05, "gn": 0.373}, {"step": 92600, "loss": 0.20675, "lr": 3.483072570033391e-05, "gn": 0.7524}, {"step": 92800, "loss": 0.20061, "lr": 3.4678603211305744e-05, "gn": 0.5618}, {"step": 93000, "loss": 0.20845, "lr": 3.4526480722277585e-05, "gn": 0.9563}, {"step": 93200, "loss": 0.20633, "lr": 3.4374358233249413e-05, "gn": 0.6874}, {"step": 93400, "loss": 0.20795, "lr": 3.422223574422125e-05, "gn": 0.8224}, {"step": 93600, "loss": 0.20538, "lr": 3.407011325519308e-05, "gn": 0.5069}, {"step": 93800, "loss": 0.20182, "lr": 3.391799076616492e-05, "gn": 0.3777}, {"step": 94000, "loss": 0.20218, "lr": 3.376586827713675e-05, "gn": 0.7912}, {"step": 94200, "loss": 0.20079, "lr": 3.361374578810859e-05, "gn": 0.4238}, {"step": 94400, "loss": 0.20007, "lr": 3.3461623299080416e-05, "gn": 0.5976}, {"step": 94600, "loss": 0.20447, "lr": 3.330950081005226e-05, "gn": 0.4903}, {"step": 94800, "loss": 0.20715, "lr": 3.315737832102409e-05, "gn": 0.6797}, {"step": 95000, "loss": 0.20161, "lr": 3.300525583199592e-05, "gn": 0.5017}, {"step": 95200, "loss": 0.20014, "lr": 3.2853133342967756e-05, "gn": 0.5894}, {"step": 95400, "loss": 0.19947, "lr": 3.27010108539396e-05, "gn": 0.4116}, {"step": 95600, "loss": 0.19708, "lr": 3.2548888364911426e-05, "gn": 0.6676}, {"step": 95800, "loss": 0.20476, "lr": 3.239676587588326e-05, "gn": 0.4027}, {"step": 96000, "loss": 0.21494, "lr": 3.2244643386855096e-05, "gn": 0.7151}, {"step": 96200, "loss": 0.20381, "lr": 3.209252089782693e-05, "gn": 0.5092}, {"step": 96400, "loss": 0.20642, "lr": 3.1940398408798766e-05, "gn": 0.5271}, {"step": 96600, "loss": 0.19838, "lr": 3.17882759197706e-05, "gn": 0.3791}, {"step": 96800, "loss": 0.19934, "lr": 3.1636153430742436e-05, "gn": 0.3164}, {"step": 97000, "loss": 0.20103, "lr": 3.148403094171427e-05, "gn": 0.5847}, {"step": 97200, "loss": 0.20151, "lr": 3.1331908452686106e-05, "gn": 0.5249}, {"step": 97400, "loss": 0.19007, "lr": 3.1179785963657934e-05, "gn": 0.6348}, {"step": 97600, "loss": 0.20875, "lr": 3.1027663474629775e-05, "gn": 0.5976}, {"step": 97800, "loss": 0.20405, "lr": 3.087554098560161e-05, "gn": 0.7657}, {"step": 98000, "loss": 0.20137, "lr": 3.072341849657344e-05, "gn": 0.5767}, {"step": 98200, "loss": 0.21318, "lr": 3.0571296007545274e-05, "gn": 0.5775}, {"step": 98400, "loss": 0.20163, "lr": 3.0419173518517112e-05, "gn": 0.5512}, {"step": 98600, "loss": 0.20161, "lr": 3.0267051029488947e-05, "gn": 0.6088}, {"step": 98800, "loss": 0.21268, "lr": 3.011492854046078e-05, "gn": 0.594}, {"step": 99000, "loss": 0.20501, "lr": 2.9962806051432613e-05, "gn": 0.9993}, {"step": 99200, "loss": 0.20166, "lr": 2.981068356240445e-05, "gn": 0.6814}, {"step": 99400, "loss": 0.21209, "lr": 2.9658561073376283e-05, "gn": 1.0614}, {"step": 99600, "loss": 0.19937, "lr": 2.9506438584348118e-05, "gn": 0.5328}, {"step": 99800, "loss": 0.21011, "lr": 2.935431609531995e-05, "gn": 0.5685}, {"step": 100000, "loss": 0.199, "lr": 2.9202193606291788e-05, "gn": 0.4376}, {"step": 100200, "loss": 0.20153, "lr": 2.9050071117263623e-05, "gn": 0.4259}, {"step": 100400, "loss": 0.20357, "lr": 2.8897948628235455e-05, "gn": 0.7827}, {"step": 100600, "loss": 0.20268, "lr": 2.8745826139207293e-05, "gn": 0.5606}, {"step": 100800, "loss": 0.2025, "lr": 2.8593703650179128e-05, "gn": 0.5231}, {"step": 101000, "loss": 0.19542, "lr": 2.844158116115096e-05, "gn": 0.458}, {"step": 101200, "loss": 0.20501, "lr": 2.8289458672122794e-05, "gn": 0.6231}, {"step": 101400, "loss": 0.20519, "lr": 2.8137336183094633e-05, "gn": 0.5068}, {"step": 101600, "loss": 0.20164, "lr": 2.7985213694066464e-05, "gn": 0.5823}, {"step": 101800, "loss": 0.20106, "lr": 2.78330912050383e-05, "gn": 0.462}, {"step": 102000, "loss": 0.2044, "lr": 2.768096871601013e-05, "gn": 0.6724}, {"step": 102200, "loss": 0.19518, "lr": 2.752884622698197e-05, "gn": 0.445}, {"step": 102400, "loss": 0.20046, "lr": 2.73767237379538e-05, "gn": 0.6851}, {"step": 102600, "loss": 0.20598, "lr": 2.7224601248925636e-05, "gn": 0.8283}, {"step": 102800, "loss": 0.20173, "lr": 2.7072478759897467e-05, "gn": 0.6555}, {"step": 103000, "loss": 0.21963, "lr": 2.6920356270869305e-05, "gn": 0.6553}, {"step": 103200, "loss": 0.1973, "lr": 2.676823378184114e-05, "gn": 0.8557}, {"step": 103400, "loss": 0.20412, "lr": 2.6616111292812972e-05, "gn": 0.3704}, {"step": 103600, "loss": 0.20413, "lr": 2.6463988803784807e-05, "gn": 0.4479}, {"step": 103800, "loss": 0.2022, "lr": 2.6311866314756645e-05, "gn": 0.6249}, {"step": 104000, "loss": 0.20313, "lr": 2.6159743825728477e-05, "gn": 0.5383}, {"step": 104200, "loss": 0.2042, "lr": 2.6007621336700312e-05, "gn": 0.6676}, {"step": 104400, "loss": 0.1994, "lr": 2.585549884767215e-05, "gn": 0.4329}, {"step": 104600, "loss": 0.20076, "lr": 2.570337635864398e-05, "gn": 0.9154}, {"step": 104800, "loss": 0.20536, "lr": 2.5551253869615817e-05, "gn": 0.7471}, {"step": 105000, "loss": 0.20122, "lr": 2.5399131380587648e-05, "gn": 0.5992}, {"step": 105200, "loss": 0.20336, "lr": 2.5247008891559486e-05, "gn": 0.5146}, {"step": 105400, "loss": 0.20305, "lr": 2.509488640253132e-05, "gn": 0.6991}, {"step": 105600, "loss": 0.20012, "lr": 2.4942763913503153e-05, "gn": 0.5264}, {"step": 105800, "loss": 0.20057, "lr": 2.4790641424474988e-05, "gn": 0.481}, {"step": 106000, "loss": 0.19932, "lr": 2.4638518935446823e-05, "gn": 0.657}, {"step": 106200, "loss": 0.1993, "lr": 2.4486396446418658e-05, "gn": 0.5737}, {"step": 106400, "loss": 0.20665, "lr": 2.433427395739049e-05, "gn": 0.3906}, {"step": 106600, "loss": 0.20538, "lr": 2.4182151468362328e-05, "gn": 0.6041}, {"step": 106800, "loss": 0.20759, "lr": 2.403002897933416e-05, "gn": 0.5661}, {"step": 107000, "loss": 0.19781, "lr": 2.3877906490305994e-05, "gn": 0.6011}, {"step": 107200, "loss": 0.19772, "lr": 2.372578400127783e-05, "gn": 0.5575}, {"step": 107400, "loss": 0.19548, "lr": 2.3573661512249664e-05, "gn": 0.7342}, {"step": 107600, "loss": 0.19779, "lr": 2.34215390232215e-05, "gn": 0.6296}, {"step": 107800, "loss": 0.20029, "lr": 2.3269416534193334e-05, "gn": 1.1947}, {"step": 108000, "loss": 0.20068, "lr": 2.311729404516517e-05, "gn": 0.6956}, {"step": 108200, "loss": 0.20677, "lr": 2.2965171556137004e-05, "gn": 0.5498}, {"step": 108400, "loss": 0.20013, "lr": 2.281304906710884e-05, "gn": 0.6365}, {"step": 108600, "loss": 0.21102, "lr": 2.266092657808067e-05, "gn": 0.4894}, {"step": 108800, "loss": 0.19745, "lr": 2.250880408905251e-05, "gn": 0.884}, {"step": 109000, "loss": 0.20108, "lr": 2.235668160002434e-05, "gn": 0.5884}, {"step": 109200, "loss": 0.20079, "lr": 2.2204559110996175e-05, "gn": 0.8471}, {"step": 109400, "loss": 0.19772, "lr": 2.205243662196801e-05, "gn": 0.6007}, {"step": 109600, "loss": 0.20375, "lr": 2.1900314132939845e-05, "gn": 0.7629}, {"step": 109800, "loss": 0.20034, "lr": 2.1748191643911677e-05, "gn": 0.454}, {"step": 110000, "loss": 0.19115, "lr": 2.1596069154883515e-05, "gn": 0.4147}, {"step": 110200, "loss": 0.19807, "lr": 2.1443946665855347e-05, "gn": 0.6603}, {"step": 110400, "loss": 0.19907, "lr": 2.129182417682718e-05, "gn": 0.4093}, {"step": 110600, "loss": 0.19468, "lr": 2.1139701687799016e-05, "gn": 0.4568}, {"step": 110800, "loss": 0.20452, "lr": 2.098757919877085e-05, "gn": 0.5856}, {"step": 111000, "loss": 0.20477, "lr": 2.0835456709742683e-05, "gn": 0.5702}, {"step": 111200, "loss": 0.2038, "lr": 2.068333422071452e-05, "gn": 0.4381}, {"step": 111400, "loss": 0.19919, "lr": 2.0531211731686356e-05, "gn": 0.7752}, {"step": 111600, "loss": 0.20367, "lr": 2.0379089242658188e-05, "gn": 0.4565}, {"step": 111800, "loss": 0.19618, "lr": 2.0226966753630026e-05, "gn": 0.599}, {"step": 112000, "loss": 0.20001, "lr": 2.0074844264601858e-05, "gn": 0.4928}, {"step": 112200, "loss": 0.19395, "lr": 1.9922721775573693e-05, "gn": 0.4179}, {"step": 112400, "loss": 0.1958, "lr": 1.9770599286545528e-05, "gn": 0.6482}, {"step": 112600, "loss": 0.20393, "lr": 1.9618476797517363e-05, "gn": 0.5162}, {"step": 112800, "loss": 0.19812, "lr": 1.9466354308489197e-05, "gn": 0.5225}, {"step": 113000, "loss": 0.19932, "lr": 1.9314231819461032e-05, "gn": 0.6316}, {"step": 113200, "loss": 0.20011, "lr": 1.9162109330432864e-05, "gn": 0.5729}, {"step": 113400, "loss": 0.20299, "lr": 1.90099868414047e-05, "gn": 0.4216}, {"step": 113600, "loss": 0.20211, "lr": 1.8857864352376534e-05, "gn": 0.469}, {"step": 113800, "loss": 0.19967, "lr": 1.870574186334837e-05, "gn": 0.3095}, {"step": 114000, "loss": 0.19908, "lr": 1.8553619374320204e-05, "gn": 0.6477}, {"step": 114200, "loss": 0.20454, "lr": 1.840149688529204e-05, "gn": 0.4419}, {"step": 114400, "loss": 0.19779, "lr": 1.824937439626387e-05, "gn": 0.4619}, {"step": 114600, "loss": 0.1993, "lr": 1.809725190723571e-05, "gn": 0.3917}, {"step": 114800, "loss": 0.20473, "lr": 1.794512941820754e-05, "gn": 0.5784}, {"step": 115000, "loss": 0.20042, "lr": 1.7793006929179375e-05, "gn": 0.5176}, {"step": 115200, "loss": 0.20259, "lr": 1.7640884440151213e-05, "gn": 0.6849}, {"step": 115400, "loss": 0.19457, "lr": 1.7488761951123045e-05, "gn": 0.3668}, {"step": 115600, "loss": 0.20231, "lr": 1.733663946209488e-05, "gn": 0.5443}, {"step": 115800, "loss": 0.19649, "lr": 1.7184516973066715e-05, "gn": 0.6277}, {"step": 116000, "loss": 0.19811, "lr": 1.703239448403855e-05, "gn": 0.6089}, {"step": 116200, "loss": 0.19489, "lr": 1.688027199501038e-05, "gn": 0.6265}, {"step": 116400, "loss": 0.20477, "lr": 1.672814950598222e-05, "gn": 0.6121}, {"step": 116600, "loss": 0.19791, "lr": 1.657602701695405e-05, "gn": 0.5988}, {"step": 116800, "loss": 0.20185, "lr": 1.6423904527925886e-05, "gn": 0.5491}, {"step": 117000, "loss": 0.18904, "lr": 1.627178203889772e-05, "gn": 0.4508}, {"step": 117200, "loss": 0.19985, "lr": 1.6119659549869556e-05, "gn": 0.7288}, {"step": 117400, "loss": 0.19697, "lr": 1.5967537060841388e-05, "gn": 0.5695}, {"step": 117600, "loss": 0.20094, "lr": 1.5815414571813226e-05, "gn": 0.4798}, {"step": 117800, "loss": 0.20407, "lr": 1.5663292082785058e-05, "gn": 0.784}, {"step": 118000, "loss": 0.20239, "lr": 1.5511169593756893e-05, "gn": 0.5381}, {"step": 118200, "loss": 0.19311, "lr": 1.5359047104728727e-05, "gn": 1.0337}, {"step": 118400, "loss": 0.20377, "lr": 1.5206924615700562e-05, "gn": 0.4017}, {"step": 118600, "loss": 0.19909, "lr": 1.5054802126672396e-05, "gn": 0.5421}, {"step": 118800, "loss": 0.19822, "lr": 1.4902679637644232e-05, "gn": 0.3613}, {"step": 119000, "loss": 0.20255, "lr": 1.4750557148616067e-05, "gn": 0.4883}, {"step": 119200, "loss": 0.19774, "lr": 1.45984346595879e-05, "gn": 0.4995}, {"step": 119400, "loss": 0.19718, "lr": 1.4446312170559737e-05, "gn": 0.5007}, {"step": 119600, "loss": 0.2018, "lr": 1.429418968153157e-05, "gn": 0.4802}, {"step": 119800, "loss": 0.20104, "lr": 1.4142067192503405e-05, "gn": 0.7705}, {"step": 120000, "loss": 0.20634, "lr": 1.3989944703475239e-05, "gn": 0.7242}, {"step": 120200, "loss": 0.19436, "lr": 1.3837822214447074e-05, "gn": 0.5099}, {"step": 120400, "loss": 0.20061, "lr": 1.3685699725418907e-05, "gn": 0.8025}, {"step": 120600, "loss": 0.19561, "lr": 1.3533577236390743e-05, "gn": 0.4886}, {"step": 120800, "loss": 0.20169, "lr": 1.3381454747362577e-05, "gn": 0.7687}, {"step": 121000, "loss": 0.2022, "lr": 1.3229332258334412e-05, "gn": 0.5108}, {"step": 121200, "loss": 0.19578, "lr": 1.3077209769306245e-05, "gn": 0.4391}, {"step": 121400, "loss": 0.1999, "lr": 1.2925087280278081e-05, "gn": 0.5026}, {"step": 121600, "loss": 0.20152, "lr": 1.2772964791249915e-05, "gn": 0.565}, {"step": 121800, "loss": 0.20472, "lr": 1.262084230222175e-05, "gn": 0.5543}, {"step": 122000, "loss": 0.19969, "lr": 1.2468719813193585e-05, "gn": 0.4718}, {"step": 122200, "loss": 0.20162, "lr": 1.2316597324165418e-05, "gn": 0.6813}, {"step": 122400, "loss": 0.19948, "lr": 1.2164474835137253e-05, "gn": 0.3565}, {"step": 122600, "loss": 0.20061, "lr": 1.2012352346109088e-05, "gn": 0.6428}, {"step": 122800, "loss": 0.20269, "lr": 1.1860229857080923e-05, "gn": 0.5577}, {"step": 123000, "loss": 0.19008, "lr": 1.1708107368052756e-05, "gn": 0.7575}, {"step": 123200, "loss": 0.19541, "lr": 1.1555984879024591e-05, "gn": 0.5388}, {"step": 123400, "loss": 0.19798, "lr": 1.1403862389996426e-05, "gn": 0.3915}, {"step": 123600, "loss": 0.19976, "lr": 1.1251739900968259e-05, "gn": 0.4057}, {"step": 123800, "loss": 0.19955, "lr": 1.1099617411940094e-05, "gn": 0.665}, {"step": 124000, "loss": 0.20031, "lr": 1.0947494922911929e-05, "gn": 0.5967}, {"step": 124200, "loss": 0.19991, "lr": 1.0795372433883762e-05, "gn": 0.4504}, {"step": 124400, "loss": 0.20322, "lr": 1.0643249944855599e-05, "gn": 0.5773}, {"step": 124600, "loss": 0.19473, "lr": 1.0491127455827434e-05, "gn": 0.9133}, {"step": 124800, "loss": 0.1956, "lr": 1.0339004966799267e-05, "gn": 0.5852}, {"step": 125000, "loss": 0.19326, "lr": 1.0186882477771102e-05, "gn": 0.8237}, {"step": 125200, "loss": 0.20008, "lr": 1.0034759988742937e-05, "gn": 0.5052}, {"step": 125400, "loss": 0.20485, "lr": 9.88263749971477e-06, "gn": 0.6487}, {"step": 125600, "loss": 0.20006, "lr": 9.730515010686605e-06, "gn": 0.5382}, {"step": 125800, "loss": 0.20167, "lr": 9.57839252165844e-06, "gn": 0.5189}, {"step": 126000, "loss": 0.19627, "lr": 9.426270032630275e-06, "gn": 0.5201}, {"step": 126200, "loss": 0.19494, "lr": 9.274147543602108e-06, "gn": 0.4728}, {"step": 126400, "loss": 0.19858, "lr": 9.122025054573943e-06, "gn": 0.5464}, {"step": 126600, "loss": 0.19937, "lr": 8.969902565545778e-06, "gn": 0.5065}, {"step": 126800, "loss": 0.19604, "lr": 8.817780076517611e-06, "gn": 0.4161}, {"step": 127000, "loss": 0.19911, "lr": 8.665657587489446e-06, "gn": 0.5095}, {"step": 127200, "loss": 0.19634, "lr": 8.513535098461281e-06, "gn": 0.5333}, {"step": 127400, "loss": 0.19638, "lr": 8.361412609433116e-06, "gn": 0.4172}, {"step": 127600, "loss": 0.19856, "lr": 8.20929012040495e-06, "gn": 0.6344}, {"step": 127800, "loss": 0.20178, "lr": 8.057167631376785e-06, "gn": 0.5595}, {"step": 128000, "loss": 0.1931, "lr": 7.90504514234862e-06, "gn": 0.5483}, {"step": 128200, "loss": 0.20352, "lr": 7.752922653320454e-06, "gn": 0.5818}, {"step": 128400, "loss": 0.19713, "lr": 7.600800164292289e-06, "gn": 0.497}, {"step": 128600, "loss": 0.20198, "lr": 7.4486776752641235e-06, "gn": 0.8812}, {"step": 128800, "loss": 0.19823, "lr": 7.2965551862359576e-06, "gn": 0.5454}, {"step": 129000, "loss": 0.20178, "lr": 7.1444326972077925e-06, "gn": 0.5178}, {"step": 129200, "loss": 0.19836, "lr": 6.992310208179627e-06, "gn": 0.5162}, {"step": 129400, "loss": 0.20125, "lr": 6.8401877191514615e-06, "gn": 0.4608}, {"step": 129600, "loss": 0.19984, "lr": 6.688065230123296e-06, "gn": 0.7004}, {"step": 129800, "loss": 0.19486, "lr": 6.53594274109513e-06, "gn": 0.5906}, {"step": 130000, "loss": 0.20316, "lr": 6.383820252066965e-06, "gn": 0.5526}, {"step": 130200, "loss": 0.19653, "lr": 6.231697763038799e-06, "gn": 0.5051}, {"step": 130400, "loss": 0.20136, "lr": 6.079575274010634e-06, "gn": 0.6182}, {"step": 130600, "loss": 0.19551, "lr": 5.927452784982468e-06, "gn": 0.5564}, {"step": 130800, "loss": 0.19882, "lr": 5.775330295954303e-06, "gn": 0.4596}, {"step": 131000, "loss": 0.20018, "lr": 5.623207806926138e-06, "gn": 0.6327}, {"step": 131200, "loss": 0.19994, "lr": 5.471085317897972e-06, "gn": 0.3829}, {"step": 131400, "loss": 0.1982, "lr": 5.318962828869807e-06, "gn": 0.573}, {"step": 131600, "loss": 0.2021, "lr": 5.166840339841641e-06, "gn": 0.4917}, {"step": 131800, "loss": 0.19422, "lr": 5.014717850813475e-06, "gn": 0.3934}, {"step": 132000, "loss": 0.1929, "lr": 4.86259536178531e-06, "gn": 0.5639}, {"step": 132200, "loss": 0.19819, "lr": 4.710472872757144e-06, "gn": 0.5869}, {"step": 132400, "loss": 0.20218, "lr": 4.558350383728979e-06, "gn": 0.4637}, {"step": 132600, "loss": 0.20185, "lr": 4.406227894700813e-06, "gn": 0.8013}, {"step": 132800, "loss": 0.19909, "lr": 4.254105405672648e-06, "gn": 0.5267}, {"step": 133000, "loss": 0.20312, "lr": 4.101982916644483e-06, "gn": 1.0211}, {"step": 133200, "loss": 0.20016, "lr": 3.949860427616317e-06, "gn": 0.4218}, {"step": 133400, "loss": 0.20188, "lr": 3.7977379385881516e-06, "gn": 0.7732}, {"step": 133600, "loss": 0.20305, "lr": 3.645615449559986e-06, "gn": 0.6756}, {"step": 133800, "loss": 0.20325, "lr": 3.49349296053182e-06, "gn": 0.4389}, {"step": 134000, "loss": 0.19429, "lr": 3.3413704715036547e-06, "gn": 0.6351}, {"step": 134200, "loss": 0.20248, "lr": 3.1892479824754892e-06, "gn": 0.4711}, {"step": 134400, "loss": 0.19967, "lr": 3.037125493447324e-06, "gn": 0.4351}, {"step": 134600, "loss": 0.20026, "lr": 2.8850030044191583e-06, "gn": 0.3847}, {"step": 134800, "loss": 0.20531, "lr": 2.732880515390993e-06, "gn": 0.6094}, {"step": 135000, "loss": 0.19879, "lr": 2.5807580263628273e-06, "gn": 0.7588}, {"step": 135200, "loss": 0.19695, "lr": 2.4286355373346623e-06, "gn": 0.5482}, {"step": 135400, "loss": 0.19637, "lr": 2.2765130483064964e-06, "gn": 0.6957}, {"step": 135600, "loss": 0.20336, "lr": 2.124390559278331e-06, "gn": 0.5939}, {"step": 135800, "loss": 0.20153, "lr": 1.9722680702501654e-06, "gn": 0.5953}, {"step": 136000, "loss": 0.19111, "lr": 1.820145581222e-06, "gn": 0.4913}, {"step": 136200, "loss": 0.2021, "lr": 1.6680230921938347e-06, "gn": 0.4481}, {"step": 136400, "loss": 0.19292, "lr": 1.5159006031656692e-06, "gn": 0.4801}, {"step": 136600, "loss": 0.19903, "lr": 1.3637781141375035e-06, "gn": 0.4635}, {"step": 136800, "loss": 0.19429, "lr": 1.2116556251093382e-06, "gn": 0.4669}, {"step": 137000, "loss": 0.20093, "lr": 1.0595331360811725e-06, "gn": 0.5241}, {"step": 137200, "loss": 0.19908, "lr": 9.074106470530071e-07, "gn": 0.4433}, {"step": 137400, "loss": 0.19358, "lr": 7.552881580248417e-07, "gn": 0.5401}, {"step": 137600, "loss": 0.19911, "lr": 6.031656689966762e-07, "gn": 0.5405}, {"step": 137800, "loss": 0.20166, "lr": 4.510431799685107e-07, "gn": 0.5803}, {"step": 138000, "loss": 0.18948, "lr": 2.989206909403452e-07, "gn": 0.6357}, {"step": 138200, "loss": 0.19163, "lr": 1.4679820191217968e-07, "gn": 0.3319}], "eval": [{"step": 5000, "loss": 0.39224}, {"step": 10000, "loss": 0.29058}, {"step": 15000, "loss": 0.25387}, {"step": 20000, "loss": 0.24405}, {"step": 25000, "loss": 0.23168}, {"step": 30000, "loss": 0.22268}, {"step": 35000, "loss": 0.21808}, {"step": 40000, "loss": 0.21515}, {"step": 45000, "loss": 0.21936}, {"step": 50000, "loss": 0.21015}, {"step": 55000, "loss": 0.20976}, {"step": 60000, "loss": 0.21071}, {"step": 65000, "loss": 0.20907}, {"step": 70000, "loss": 0.20656}, {"step": 75000, "loss": 0.2058}, {"step": 80000, "loss": 0.20301}, {"step": 85000, "loss": 0.20323}, {"step": 90000, "loss": 0.20179}, {"step": 95000, "loss": 0.20067}, {"step": 100000, "loss": 0.20269}, {"step": 105000, "loss": 0.19888}, {"step": 110000, "loss": 0.19932}, {"step": 115000, "loss": 0.20113}, {"step": 120000, "loss": 0.2008}, {"step": 125000, "loss": 0.20131}, {"step": 130000, "loss": 0.19927}, {"step": 135000, "loss": 0.2028}, {"step": 138392, "loss": 0.19827}], "best": 0.19826915860176086, "total_steps": 138200}</script>
+<script>
+(function () {
+  const D = JSON.parse(document.getElementById('run-data').textContent);
+  const TOTAL = 138392;
+  const BASE = { step: 0, loss: 2.3427 };
+
+  const train = D.train.map(d => ({ x: d.step, y: d.loss }));
+  const evalp = [{ x: 0, y: BASE.loss }].concat(D.eval.map(d => ({ x: d.step, y: d.loss })));
+  const lr = D.train.map(d => ({ x: d.step, y: d.lr }));
+
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const nf = (v, d) => v.toFixed(d);
+  const kfmt = v => v === 0 ? '0' : (v / 1000) + 'k';
+
+  function chart(cfg) {
+    const host = document.getElementById(cfg.host);
+    const tip = document.getElementById(cfg.tip);
+    let xs, ys, cur = null;
+
+    function draw() {
+      const W = Math.max(300, host.clientWidth), H = cfg.height, m = cfg.margin;
+      const iw = W - m.l - m.r, ih = H - m.t - m.b;
+      const [x0, x1] = cfg.xDomain, [y0, y1] = cfg.yDomain;
+      xs = v => m.l + (v - x0) / (x1 - x0) * iw;
+      if (cfg.log) {
+        const a = Math.log10(y0), b = Math.log10(y1);
+        ys = v => m.t + ih - (Math.log10(v) - a) / (b - a) * ih;
+      } else {
+        ys = v => m.t + ih - (v - y0) / (y1 - y0) * ih;
+      }
+
+      let s = '';
+      cfg.yTicks.forEach(t => {
+        const y = ys(t);
+        s += `<line class="grid" x1="${m.l}" y1="${y.toFixed(1)}" x2="${(W - m.r).toFixed(1)}" y2="${y.toFixed(1)}"/>`;
+        s += `<text class="tick" x="${m.l - 9}" y="${(y + 3.5).toFixed(1)}" text-anchor="end">${cfg.yFmt(t)}</text>`;
+      });
+      cfg.xTicks.forEach(t => {
+        s += `<text class="tick" x="${xs(t).toFixed(1)}" y="${H - m.b + 17}" text-anchor="middle">${kfmt(t)}</text>`;
+      });
+      s += `<line class="axis" x1="${m.l}" y1="${(m.t + ih).toFixed(1)}" x2="${(W - m.r).toFixed(1)}" y2="${(m.t + ih).toFixed(1)}"/>`;
+      s += `<text class="atitle" x="${m.l}" y="${H - 2}">${cfg.xTitle}</text>`;
+      s += `<text class="atitle" x="${m.l - 9}" y="${m.t - 6}" text-anchor="end">${cfg.yTitle}</text>`;
+
+      cfg.series.forEach(se => {
+        const pts = se.points.filter(p => p.x >= x0 && p.x <= x1);
+        if (!pts.length) return;
+        const d = pts.map((p, i) => (i ? 'L' : 'M') + xs(p.x).toFixed(1) + ' ' + ys(p.y).toFixed(1)).join(' ');
+        s += `<path d="${d}" fill="none" style="stroke:var(${se.cvar})" stroke-width="${se.w}" stroke-linejoin="round" stroke-linecap="round" opacity="${se.op || 1}"/>`;
+        if (se.markers) {
+          pts.forEach(p => {
+            s += `<circle cx="${xs(p.x).toFixed(1)}" cy="${ys(p.y).toFixed(1)}" r="4" style="fill:var(${se.cvar});stroke:var(--surface)" stroke-width="2"/>`;
+          });
+        }
+      });
+
+      (cfg.labels || []).forEach(L => {
+        s += `<text class="dlabel" x="${(xs(L.x) + L.dx).toFixed(1)}" y="${(ys(L.y) + L.dy).toFixed(1)}" text-anchor="${L.anchor}" style="fill:var(${L.cvar})">${L.text}</text>`;
+      });
+
+      s += `<g id="${cfg.host}-cross" style="display:none">
+              <line class="axis" y1="${m.t}" y2="${(m.t + ih).toFixed(1)}" stroke-width="1"/>
+              ${cfg.series.map(se => `<circle r="4.5" style="fill:var(${se.cvar});stroke:var(--surface);display:none" stroke-width="2"/>`).join('')}
+            </g>`;
+
+      host.querySelectorAll('svg').forEach(n => n.remove());
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+      svg.setAttribute('width', W); svg.setAttribute('height', H);
+      svg.setAttribute('role', 'img');
+      svg.setAttribute('aria-label', cfg.aria);
+      svg.innerHTML = s;
+      host.appendChild(svg);
+      cur = { W, H, m, iw, ih, x0, x1 };
+    }
+
+    function nearest(arr, x) {
+      let best = null, bd = Infinity;
+      for (const p of arr) { const d = Math.abs(p.x - x); if (d < bd) { bd = d; best = p; } }
+      return { p: best, d: bd };
+    }
+
+    function move(ev) {
+      if (!cur) return;
+      const r = host.getBoundingClientRect();
+      const px = (ev.clientX - r.left) / r.width * cur.W;
+      if (px < cur.m.l - 4 || px > cur.W - cur.m.r + 4) { leave(); return; }
+      const step = cur.x0 + (px - cur.m.l) / cur.iw * (cur.x1 - cur.x0);
+      const g = document.getElementById(cfg.host + '-cross');
+      if (!g) return;
+      const rows = [];
+      const circles = g.querySelectorAll('circle');
+      let anchorX = null;
+      cfg.series.forEach((se, i) => {
+        const inRange = se.points.filter(p => p.x >= cur.x0 && p.x <= cur.x1);
+        const { p, d } = nearest(inRange, step);
+        const c = circles[i];
+        if (p && d <= (se.snap || Infinity)) {
+          c.setAttribute('cx', xs(p.x)); c.setAttribute('cy', ys(p.y)); c.style.display = '';
+          rows.push(`<div class="r"><i class="dot" style="background:var(${se.cvar})"></i>${se.name} <b style="font-weight:500;margin-left:auto">${cfg.vFmt(p.y)}</b></div>`);
+          if (anchorX === null || se.primary) anchorX = xs(p.x);
+        } else { c.style.display = 'none'; }
+      });
+      if (anchorX === null) { leave(); return; }
+      g.style.display = '';
+      g.querySelector('line').setAttribute('x1', anchorX);
+      g.querySelector('line').setAttribute('x2', anchorX);
+      const st = Math.round(step);
+      tip.innerHTML = `<div class="hd">step ${st.toLocaleString()} &middot; epoch ${(st / TOTAL).toFixed(3)}</div>` + rows.join('');
+      tip.style.opacity = '1';
+      tip.style.left = Math.max(7, Math.min(93, anchorX / cur.W * 100)) + '%';
+      tip.style.top = (cur.m.t + 6) + 'px';
+    }
+
+    function leave() {
+      tip.style.opacity = '0';
+      const g = document.getElementById(cfg.host + '-cross');
+      if (g) g.style.display = 'none';
+    }
+
+    host.addEventListener('mousemove', move);
+    host.addEventListener('mouseleave', leave);
+    draw();
+    return { draw, cfg };
+  }
+
+  const lossFmt = v => v.toFixed(4);
+
+  const main = chart({
+    host: 'p-main', tip: 't-main', height: 400, margin: { t: 26, r: 78, b: 42, l: 58 },
+    xDomain: [0, TOTAL], yDomain: [0.17, 2.6], log: true,
+    yTicks: [0.2, 0.3, 0.5, 1, 2], xTicks: [0, 25000, 50000, 75000, 100000, 125000],
+    yFmt: v => v.toFixed(v < 1 ? 1 : 1), vFmt: lossFmt,
+    xTitle: 'training step  (1 epoch = 138,392)', yTitle: 'loss',
+    aria: 'Line chart of training and validation loss across 138,392 steps on a logarithmic axis, falling from 2.28 to 0.19.',
+    series: [
+      { name: 'Training', cvar: '--s1', w: 1.4, op: 0.85, points: train, primary: true },
+      { name: 'Validation', cvar: '--s2', w: 2, points: evalp, markers: true, snap: 3000 }
+    ],
+    labels: [
+      { x: 200, y: 2.2831, dx: 6, dy: -9, anchor: 'start', text: '2.283', cvar: '--s1' },
+      { x: TOTAL, y: 0.1983, dx: 9, dy: 4, anchor: 'start', text: '0.198', cvar: '--s2' }
+    ]
+  });
+
+  const zPts = train.filter(p => p.x >= 20000), zEv = evalp.filter(p => p.x >= 20000);
+  const lo = Math.min(...zPts.map(p => p.y), ...zEv.map(p => p.y));
+  const hi = Math.max(...zPts.map(p => p.y), ...zEv.map(p => p.y));
+  const pad = (hi - lo) * 0.14;
+  const zd = [lo - pad, hi + pad];
+  const zTicks = [0, 1, 2, 3, 4].map(i => zd[0] + (zd[1] - zd[0]) * i / 4);
+
+  const zoom = chart({
+    host: 'p-zoom', tip: 't-zoom', height: 250, margin: { t: 22, r: 18, b: 40, l: 54 },
+    xDomain: [20000, TOTAL], yDomain: zd, log: false,
+    yTicks: zTicks, xTicks: [25000, 50000, 75000, 100000, 125000],
+    yFmt: v => v.toFixed(3), vFmt: lossFmt,
+    xTitle: 'training step', yTitle: 'loss',
+    aria: 'Linear-axis detail of loss from step 20,000 onward, oscillating between about 0.19 and 0.23.',
+    series: [
+      { name: 'Training', cvar: '--s1', w: 1.4, op: 0.8, points: zPts, primary: true },
+      { name: 'Validation', cvar: '--s2', w: 2, points: zEv, markers: true, snap: 3000 }
+    ]
+  });
+
+  const lrc = chart({
+    host: 'p-lr', tip: 't-lr', height: 250, margin: { t: 22, r: 18, b: 40, l: 54 },
+    xDomain: [0, TOTAL], yDomain: [0, 1.06e-4], log: false,
+    yTicks: [0, 2.5e-5, 5e-5, 7.5e-5, 1e-4], xTicks: [0, 50000, 100000],
+    yFmt: v => (v * 1e4).toFixed(2), vFmt: v => v.toExponential(2),
+    xTitle: 'training step', yTitle: '×10⁻⁴',
+    aria: 'Learning rate schedule: linear warmup to 1e-4 over the first 5 percent of steps, then linear decay to zero.',
+    series: [{ name: 'Learning rate', cvar: '--muted', w: 2, points: lr, primary: true }]
+  });
+
+  document.getElementById('b-log').addEventListener('click', () => setScale(true));
+  document.getElementById('b-lin').addEventListener('click', () => setScale(false));
+  function setScale(isLog) {
+    main.cfg.log = isLog;
+    main.cfg.yDomain = isLog ? [0.17, 2.6] : [0, 2.45];
+    main.cfg.yTicks = isLog ? [0.2, 0.3, 0.5, 1, 2] : [0, 0.5, 1, 1.5, 2];
+    main.cfg.yFmt = isLog ? (v => v.toFixed(1)) : (v => v.toFixed(1));
+    document.getElementById('b-log').setAttribute('aria-pressed', String(isLog));
+    document.getElementById('b-lin').setAttribute('aria-pressed', String(!isLog));
+    main.draw();
+  }
+
+  const tb = document.getElementById('tbody');
+  const best = Math.min(...D.eval.map(e => e.loss));
+  tb.innerHTML = [{ step: 0, loss: BASE.loss, base: true }].concat(D.eval).map(e => {
+    const cls = (!e.base && e.loss === best) ? ' class="best"' : '';
+    const lbl = e.base ? '0 <i style="color:var(--muted);font-style:normal">(baseline)</i>' : e.step.toLocaleString();
+    return `<tr${cls}><td>${lbl}</td><td>${(e.step / TOTAL).toFixed(3)}</td><td>${e.loss.toFixed(4)}</td><td>${Math.exp(e.loss).toFixed(3)}</td></tr>`;
+  }).join('');
+
+  const bt = document.getElementById('b-table'), tw = document.getElementById('tablewrap');
+  bt.addEventListener('click', () => {
+    const open = tw.hidden;
+    tw.hidden = !open;
+    bt.textContent = open ? 'Hide table' : 'Show table';
+    bt.setAttribute('aria-expanded', String(open));
+  });
+
+  const charts = [main, zoom, lrc];
+  let raf;
+  new ResizeObserver(() => {
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(() => charts.forEach(c => c.draw()));
+  }).observe(document.body);
+})();
+</script>
+</body>
+</html>

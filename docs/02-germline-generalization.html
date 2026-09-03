@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#f9f9f7;color:#0b0b0b}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Germline Generalization Test</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    color-scheme: light;
+    --plane:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink-2:#52514e; --muted:#898781;
+    --grid:#e1e0d9; --axis:#c3c2b7; --hair:rgba(11,11,11,0.10);
+    --s1:#2a78d6; --s2:#eb6834; --wash:rgba(42,120,214,0.07); --meter:#d8d7d0;
+    --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --plane:#0d0d0d; --surface:#1a1a19; --ink:#ffffff; --ink-2:#c3c2b7; --muted:#898781;
+      --grid:#2c2c2a; --axis:#383835; --hair:rgba(255,255,255,0.10);
+      --s1:#3987e5; --s2:#d95926; --wash:rgba(57,135,229,0.10); --meter:#33332f;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --plane:#0d0d0d; --surface:#1a1a19; --ink:#ffffff; --ink-2:#c3c2b7; --muted:#898781;
+    --grid:#2c2c2a; --axis:#383835; --hair:rgba(255,255,255,0.10);
+    --s1:#3987e5; --s2:#d95926; --wash:rgba(57,135,229,0.10); --meter:#33332f;
+  }
+
+  body { background: var(--plane); color: var(--ink); font-family: var(--sans); }
+  * { box-sizing: border-box; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+  .wrap { max-width:1080px; margin:0 auto; padding:40px 24px 72px; display:flex; flex-direction:column; gap:28px; }
+  .eyebrow { font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+  header h1 { font-size:clamp(26px,4vw,36px); font-weight:600; letter-spacing:-.02em; margin:10px 0 8px; text-wrap:balance; }
+  header p { margin:0; color:var(--ink-2); font-size:15px; line-height:1.6; max-width:68ch; }
+
+  .runs { display:flex; flex-wrap:wrap; gap:10px 26px; margin-top:18px; padding-top:16px; border-top:1px solid var(--hair);
+          font-family:var(--mono); font-size:12px; color:var(--ink-2); }
+  .runs span { display:inline-flex; align-items:center; gap:8px; }
+  .key { width:13px; height:3px; border-radius:2px; flex:none; }
+
+  .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:1px; background:var(--hair);
+           border:1px solid var(--hair); border-radius:3px; overflow:hidden; }
+  .stat { background:var(--surface); padding:16px 18px; display:flex; flex-direction:column; gap:5px; }
+  .stat .k { font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+  .stat .v { font-size:25px; font-weight:600; letter-spacing:-.02em; line-height:1.05; }
+  .stat .s { font-size:12px; color:var(--ink-2); }
+  .stat .s i { font-style:normal; color:var(--muted); }
+
+  .card { background:var(--surface); border:1px solid var(--hair); border-radius:3px; padding:18px 20px 14px; }
+  .card > header { display:flex; align-items:baseline; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:4px; }
+  .card h2 { font-size:15px; font-weight:600; margin:0; letter-spacing:-.01em; }
+  .card .sub { font-size:12.5px; color:var(--ink-2); margin:3px 0 0; max-width:74ch; line-height:1.55; }
+
+  .seg { display:inline-flex; border:1px solid var(--hair); border-radius:3px; overflow:hidden; }
+  .seg button { font-family:var(--mono); font-size:11px; letter-spacing:.06em; text-transform:uppercase;
+                padding:5px 11px; background:transparent; color:var(--ink-2); border:0; cursor:pointer; }
+  .seg button + button { border-left:1px solid var(--hair); }
+  .seg button[aria-pressed="true"] { background:var(--wash); color:var(--ink); font-weight:500; }
+  .seg button:focus-visible, .tbtn:focus-visible { outline:2px solid var(--s1); outline-offset:-2px; }
+
+  .legend { display:flex; gap:18px; align-items:center; flex-wrap:wrap; margin:10px 0 2px; font-size:12.5px; color:var(--ink-2); }
+  .legend span { display:inline-flex; align-items:center; gap:7px; }
+
+  .plot { position:relative; width:100%; }
+  .plot svg { display:block; width:100%; height:auto; overflow:visible; }
+  .grid { stroke:var(--grid); stroke-width:1; }
+  .axis { stroke:var(--axis); stroke-width:1; }
+  .tick { font-family:var(--mono); font-size:10.5px; fill:var(--muted); font-variant-numeric:tabular-nums; }
+  .atitle { font-family:var(--sans); font-size:11.5px; fill:var(--muted); }
+  .dlabel { font-family:var(--mono); font-size:11px; font-weight:500; font-variant-numeric:tabular-nums; }
+
+  .tip { position:absolute; pointer-events:none; opacity:0; transform:translate(-50%,0);
+         background:var(--surface); border:1px solid var(--hair); border-radius:3px; padding:8px 10px;
+         box-shadow:0 6px 20px rgba(0,0,0,.13); font-family:var(--mono); font-size:11.5px; white-space:nowrap;
+         color:var(--ink); z-index:5; font-variant-numeric:tabular-nums; }
+  .tip .r { display:flex; align-items:center; gap:7px; }
+  .tip .r + .r { margin-top:3px; }
+  .tip .hd { color:var(--muted); margin-bottom:5px; letter-spacing:.04em; }
+  .tip .dot { width:7px; height:7px; border-radius:50%; flex:none; }
+
+  .bars { display:flex; flex-direction:column; gap:16px; margin-top:16px; }
+  .bar .top { display:flex; justify-content:space-between; align-items:baseline; gap:12px; margin-bottom:6px; }
+  .bar .nm { font-size:13px; font-weight:500; }
+  .bar .nm em { font-style:normal; color:var(--muted); font-weight:400; font-size:12px; }
+  .bar .pc { font-family:var(--mono); font-size:15px; font-weight:500; font-variant-numeric:tabular-nums; }
+  .track { height:10px; background:var(--meter); border-radius:2px; overflow:hidden; }
+  .fill { height:100%; border-radius:0 4px 4px 0; }
+
+  .tablewrap { overflow-x:auto; margin-top:14px; }
+  table { border-collapse:collapse; width:100%; font-family:var(--mono); font-size:12px; font-variant-numeric:tabular-nums; }
+  th, td { text-align:right; padding:6px 10px; border-bottom:1px solid var(--hair); white-space:nowrap; }
+  th { color:var(--muted); font-weight:500; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; }
+  td { color:var(--ink-2); }
+  td:first-child, th:first-child { text-align:left; }
+  td.na { color:var(--muted); }
+  .tbtn { font-family:var(--mono); font-size:11px; letter-spacing:.06em; text-transform:uppercase; padding:6px 12px;
+          background:transparent; border:1px solid var(--hair); border-radius:3px; color:var(--ink-2); cursor:pointer; }
+
+  .note { border-left:2px solid var(--s2); padding:2px 0 2px 14px; }
+  footer { font-size:12.5px; color:var(--muted); line-height:1.65; border-top:1px solid var(--hair); padding-top:16px; max-width:76ch; }
+  footer code, .sub code { font-family:var(--mono); font-size:11.5px; color:var(--ink-2); }
+</style>
+
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Held-out germlines &middot; A/B comparison</div>
+    <h1>Does framework knowledge transfer to unseen V genes?</h1>
+    <p>The first fine-tune split its validation set at random, so somatic-hypermutation variants of the same germline sat on both sides, so the model was scored partly on scaffolds it had memorised. The second run holds out <b>35 of 196 whole V genes</b> (620,884 sequences, 22.4%), so every germline it is tested on is one it never saw. This page compares the two.</p>
+    <div class="runs">
+      <span><i class="key" style="background:var(--s1)"></i> <b>Random split</b>: 138,392 steps · 5.16 h · full epoch</span>
+      <span><i class="key" style="background:var(--s2)"></i> <b>V-gene held out</b>: 80,000 steps · 2.62 h · early-stopped</span>
+    </div>
+  </header>
+
+  <section class="stats">
+    <div class="stat">
+      <span class="k">Unseen germlines</span>
+      <span class="v">90.03%</span>
+      <span class="s"><i>masked residues recovered</i></span>
+    </div>
+    <div class="stat">
+      <span class="k">Seen germlines</span>
+      <span class="v">94.77%</span>
+      <span class="s"><i>in-distribution ceiling</i></span>
+    </div>
+    <div class="stat">
+      <span class="k">Generalisation cost</span>
+      <span class="v">4.7 pts</span>
+      <span class="s"><i>the price of a novel V gene</i></span>
+    </div>
+    <div class="stat">
+      <span class="k">Time saved</span>
+      <span class="v">49%</span>
+      <span class="s">2.62 h <i>vs</i> 5.16 h</span>
+    </div>
+  </section>
+
+  <section class="card">
+    <header>
+      <div>
+        <h2>Validation loss, both runs</h2>
+        <p class="sub"><b>The vertical gap is task difficulty, not model quality.</b> Each curve is scored on its own validation set: blue on sequences whose germlines were also in training, orange on 35 germlines held out entirely. Orange sits higher because it is answering a harder question, not because that model is worse. Faint lines are training loss; the marker at 80,000 is where early stopping ended the orange run.</p>
+      </div>
+      <div class="seg" role="group" aria-label="y-axis scale">
+        <button id="b-log" aria-pressed="true">Log</button>
+        <button id="b-lin" aria-pressed="false">Linear</button>
+      </div>
+    </header>
+    <div class="legend">
+      <span><i class="key" style="background:var(--s1)"></i> Random split, validation</span>
+      <span><i class="key" style="background:var(--s2)"></i> V-gene held out, validation</span>
+      <span><i class="key" style="background:var(--muted);opacity:.55"></i> training loss (both)</span>
+    </div>
+    <div class="plot" id="p-main"><div class="tip" id="t-main"></div></div>
+  </section>
+
+  <section class="card">
+    <header><div>
+      <h2>Masked-residue recovery on held-out V genes</h2>
+      <p class="sub">All three models scored on the same 400 sequences drawn from germlines neither fine-tune's validation set shares with the V-gene run's training data. 15% of residues masked, top-1 prediction.</p>
+    </div></header>
+    <div class="bars" id="bars"></div>
+  </section>
+
+  <section class="card">
+    <header>
+      <div>
+        <h2>Evaluation checkpoints</h2>
+        <p class="sub">Both runs evaluated every 5,000 steps. The orange run has no rows past 80,000 because early stopping ended it there.</p>
+      </div>
+      <button class="tbtn" id="b-table" aria-expanded="false" aria-controls="tablewrap">Show table</button>
+    </header>
+    <div class="tablewrap" id="tablewrap" hidden>
+      <table>
+        <thead><tr><th>Step</th><th>Random split</th><th>V-gene held out</th><th>Difference</th></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    <p class="note"><b>One confound, stated plainly.</b> The V-gene run trained 80,000 steps to the random run's 138,392, and its learning-rate schedule never finished annealing; in the first run the anneal produced the single best value on the final step. So part of the 4.7-point gap is undertraining rather than germline novelty, and the true generalisation figure is likely a little better than 90%. A clean measurement would give both runs the same fully-decayed schedule: <code>--epochs 0.6 --early-stopping-patience 0</code>.</p>
+    <p style="margin-bottom:0">Source: <code>trainer_state.json</code> from <code>checkpoint-138392</code> and <code>checkpoint-80000</code>, containing 691 + 400 training points and 28 + 16 evaluation points, the complete logged history of both runs. Recovery figures from <code>verify_generalization.py</code>. Step 0 is measured before any weight update.</p>
+  </footer>
+</div>
+
+<script id="run-data" type="application/json">{"random": {"train": [{"step": 200, "loss": 2.28311}, {"step": 400, "loss": 1.83606}, {"step": 600, "loss": 1.29627}, {"step": 800, "loss": 1.03487}, {"step": 1000, "loss": 0.89818}, {"step": 1200, "loss": 0.83388}, {"step": 1400, "loss": 0.7457}, {"step": 1600, "loss": 0.70935}, {"step": 1800, "loss": 0.65835}, {"step": 2000, "loss": 0.62499}, {"step": 2200, "loss": 0.6036}, {"step": 2400, "loss": 0.57798}, {"step": 2600, "loss": 0.5586}, {"step": 2800, "loss": 0.53382}, {"step": 3000, "loss": 0.52396}, {"step": 3200, "loss": 0.49415}, {"step": 3400, "loss": 0.48695}, {"step": 3600, "loss": 0.46112}, {"step": 3800, "loss": 0.4644}, {"step": 4000, "loss": 0.44353}, {"step": 4200, "loss": 0.43124}, {"step": 4400, "loss": 0.4287}, {"step": 4600, "loss": 0.40878}, {"step": 4800, "loss": 0.40937}, {"step": 5000, "loss": 0.40389}, {"step": 5200, "loss": 0.40127}, {"step": 5400, "loss": 0.37942}, {"step": 5600, "loss": 0.38068}, {"step": 5800, "loss": 0.37288}, {"step": 6000, "loss": 0.36155}, {"step": 6200, "loss": 0.3658}, {"step": 6400, "loss": 0.36298}, {"step": 6600, "loss": 0.34877}, {"step": 6800, "loss": 0.34881}, {"step": 7000, "loss": 0.34007}, {"step": 7200, "loss": 0.3323}, {"step": 7400, "loss": 0.32859}, {"step": 7600, "loss": 0.33337}, {"step": 7800, "loss": 0.32441}, {"step": 8000, "loss": 0.32198}, {"step": 8200, "loss": 0.32476}, {"step": 8400, "loss": 0.31856}, {"step": 8600, "loss": 0.31166}, {"step": 8800, "loss": 0.3041}, {"step": 9000, "loss": 0.29807}, {"step": 9200, "loss": 0.30432}, {"step": 9400, "loss": 0.30348}, {"step": 9600, "loss": 0.30188}, {"step": 9800, "loss": 0.29772}, {"step": 10000, "loss": 0.29206}, {"step": 10200, "loss": 0.27772}, {"step": 10400, "loss": 0.2873}, {"step": 10600, "loss": 0.28031}, {"step": 10800, "loss": 0.28022}, {"step": 11000, "loss": 0.27801}, {"step": 11200, "loss": 0.28618}, {"step": 11400, "loss": 0.28146}, {"step": 11600, "loss": 0.26983}, {"step": 11800, "loss": 0.27255}, {"step": 12000, "loss": 0.26934}, {"step": 12200, "loss": 0.27493}, {"step": 12400, "loss": 0.27021}, {"step": 12600, "loss": 0.27458}, {"step": 12800, "loss": 0.26977}, {"step": 13000, "loss": 0.2722}, {"step": 13200, "loss": 0.27352}, {"step": 13400, "loss": 0.2602}, {"step": 13600, "loss": 0.26545}, {"step": 13800, "loss": 0.26735}, {"step": 14000, "loss": 0.2674}, {"step": 14200, "loss": 0.26234}, {"step": 14400, "loss": 0.25437}, {"step": 14600, "loss": 0.26042}, {"step": 14800, "loss": 0.26068}, {"step": 15000, "loss": 0.2749}, {"step": 15200, "loss": 0.26181}, {"step": 15400, "loss": 0.25181}, {"step": 15600, "loss": 0.26386}, {"step": 15800, "loss": 0.25442}, {"step": 16000, "loss": 0.25968}, {"step": 16200, "loss": 0.25567}, {"step": 16400, "loss": 0.24781}, {"step": 16600, "loss": 0.25312}, {"step": 16800, "loss": 0.25148}, {"step": 17000, "loss": 0.25151}, {"step": 17200, "loss": 0.24842}, {"step": 17400, "loss": 0.25409}, {"step": 17600, "loss": 0.25225}, {"step": 17800, "loss": 0.24872}, {"step": 18000, "loss": 0.24935}, {"step": 18200, "loss": 0.24208}, {"step": 18400, "loss": 0.24919}, {"step": 18600, "loss": 0.24141}, {"step": 18800, "loss": 0.24293}, {"step": 19000, "loss": 0.23541}, {"step": 19200, "loss": 0.23831}, {"step": 19400, "loss": 0.24515}, {"step": 19600, "loss": 0.24001}, {"step": 19800, "loss": 0.23665}, {"step": 20000, "loss": 0.25144}, {"step": 20200, "loss": 0.24179}, {"step": 20400, "loss": 0.23611}, {"step": 20600, "loss": 0.24397}, {"step": 20800, "loss": 0.22925}, {"step": 21000, "loss": 0.23172}, {"step": 21200, "loss": 0.23996}, {"step": 21400, "loss": 0.24622}, {"step": 21600, "loss": 0.23439}, {"step": 21800, "loss": 0.23441}, {"step": 22000, "loss": 0.23398}, {"step": 22200, "loss": 0.24242}, {"step": 22400, "loss": 0.23918}, {"step": 22600, "loss": 0.23855}, {"step": 22800, "loss": 0.2353}, {"step": 23000, "loss": 0.2368}, {"step": 23200, "loss": 0.2364}, {"step": 23400, "loss": 0.23101}, {"step": 23600, "loss": 0.24139}, {"step": 23800, "loss": 0.23195}, {"step": 24000, "loss": 0.23004}, {"step": 24200, "loss": 0.22986}, {"step": 24400, "loss": 0.23895}, {"step": 24600, "loss": 0.23202}, {"step": 24800, "loss": 0.23112}, {"step": 25000, "loss": 0.24169}, {"step": 25200, "loss": 0.2297}, {"step": 25400, "loss": 0.23529}, {"step": 25600, "loss": 0.2282}, {"step": 25800, "loss": 0.23217}, {"step": 26000, "loss": 0.22628}, {"step": 26200, "loss": 0.23403}, {"step": 26400, "loss": 0.22321}, {"step": 26600, "loss": 0.22443}, {"step": 26800, "loss": 0.23546}, {"step": 27000, "loss": 0.23066}, {"step": 27200, "loss": 0.23235}, {"step": 27400, "loss": 0.23169}, {"step": 27600, "loss": 0.22132}, {"step": 27800, "loss": 0.22643}, {"step": 28000, "loss": 0.23338}, {"step": 28200, "loss": 0.23201}, {"step": 28400, "loss": 0.23577}, {"step": 28600, "loss": 0.23158}, {"step": 28800, "loss": 0.22174}, {"step": 29000, "loss": 0.23147}, {"step": 29200, "loss": 0.2309}, {"step": 29400, "loss": 0.23127}, {"step": 29600, "loss": 0.22401}, {"step": 29800, "loss": 0.2218}, {"step": 30000, "loss": 0.22137}, {"step": 30200, "loss": 0.22156}, {"step": 30400, "loss": 0.22656}, {"step": 30600, "loss": 0.22613}, {"step": 30800, "loss": 0.2264}, {"step": 31000, "loss": 0.22122}, {"step": 31200, "loss": 0.22807}, {"step": 31400, "loss": 0.22524}, {"step": 31600, "loss": 0.22213}, {"step": 31800, "loss": 0.22629}, {"step": 32000, "loss": 0.22057}, {"step": 32200, "loss": 0.23032}, {"step": 32400, "loss": 0.22113}, {"step": 32600, "loss": 0.22804}, {"step": 32800, "loss": 0.22267}, {"step": 33000, "loss": 0.22527}, {"step": 33200, "loss": 0.22521}, {"step": 33400, "loss": 0.21822}, {"step": 33600, "loss": 0.22982}, {"step": 33800, "loss": 0.22721}, {"step": 34000, "loss": 0.22343}, {"step": 34200, "loss": 0.21853}, {"step": 34400, "loss": 0.22025}, {"step": 34600, "loss": 0.2223}, {"step": 34800, "loss": 0.21429}, {"step": 35000, "loss": 0.21882}, {"step": 35200, "loss": 0.22382}, {"step": 35400, "loss": 0.21987}, {"step": 35600, "loss": 0.22261}, {"step": 35800, "loss": 0.22902}, {"step": 36000, "loss": 0.23323}, {"step": 36200, "loss": 0.22056}, {"step": 36400, "loss": 0.22359}, {"step": 36600, "loss": 0.22212}, {"step": 36800, "loss": 0.21504}, {"step": 37000, "loss": 0.22238}, {"step": 37200, "loss": 0.22152}, {"step": 37400, "loss": 0.22294}, {"step": 37600, "loss": 0.22237}, {"step": 37800, "loss": 0.2196}, {"step": 38000, "loss": 0.21858}, {"step": 38200, "loss": 0.22293}, {"step": 38400, "loss": 0.22205}, {"step": 38600, "loss": 0.21892}, {"step": 38800, "loss": 0.21492}, {"step": 39000, "loss": 0.22059}, {"step": 39200, "loss": 0.22359}, {"step": 39400, "loss": 0.21165}, {"step": 39600, "loss": 0.22365}, {"step": 39800, "loss": 0.2165}, {"step": 40000, "loss": 0.22393}, {"step": 40200, "loss": 0.22066}, {"step": 40400, "loss": 0.22441}, {"step": 40600, "loss": 0.21518}, {"step": 40800, "loss": 0.21427}, {"step": 41000, "loss": 0.21817}, {"step": 41200, "loss": 0.22322}, {"step": 41400, "loss": 0.21406}, {"step": 41600, "loss": 0.21842}, {"step": 41800, "loss": 0.21828}, {"step": 42000, "loss": 0.21546}, {"step": 42200, "loss": 0.21626}, {"step": 42400, "loss": 0.20986}, {"step": 42600, "loss": 0.21807}, {"step": 42800, "loss": 0.22035}, {"step": 43000, "loss": 0.21864}, {"step": 43200, "loss": 0.22178}, {"step": 43400, "loss": 0.21841}, {"step": 43600, "loss": 0.21278}, {"step": 43800, "loss": 0.21897}, {"step": 44000, "loss": 0.21672}, {"step": 44200, "loss": 0.21383}, {"step": 44400, "loss": 0.21411}, {"step": 44600, "loss": 0.22185}, {"step": 44800, "loss": 0.21158}, {"step": 45000, "loss": 0.21795}, {"step": 45200, "loss": 0.20859}, {"step": 45400, "loss": 0.21815}, {"step": 45600, "loss": 0.22231}, {"step": 45800, "loss": 0.21865}, {"step": 46000, "loss": 0.20458}, {"step": 46200, "loss": 0.21044}, {"step": 46400, "loss": 0.21416}, {"step": 46600, "loss": 0.21769}, {"step": 46800, "loss": 0.21213}, {"step": 47000, "loss": 0.2164}, {"step": 47200, "loss": 0.21879}, {"step": 47400, "loss": 0.2139}, {"step": 47600, "loss": 0.21787}, {"step": 47800, "loss": 0.21195}, {"step": 48000, "loss": 0.20755}, {"step": 48200, "loss": 0.21745}, {"step": 48400, "loss": 0.21678}, {"step": 48600, "loss": 0.21397}, {"step": 48800, "loss": 0.21429}, {"step": 49000, "loss": 0.2148}, {"step": 49200, "loss": 0.21463}, {"step": 49400, "loss": 0.22315}, {"step": 49600, "loss": 0.21678}, {"step": 49800, "loss": 0.21151}, {"step": 50000, "loss": 0.21744}, {"step": 50200, "loss": 0.20915}, {"step": 50400, "loss": 0.2108}, {"step": 50600, "loss": 0.20727}, {"step": 50800, "loss": 0.21095}, {"step": 51000, "loss": 0.20374}, {"step": 51200, "loss": 0.21546}, {"step": 51400, "loss": 0.2166}, {"step": 51600, "loss": 0.21734}, {"step": 51800, "loss": 0.22029}, {"step": 52000, "loss": 0.21645}, {"step": 52200, "loss": 0.20014}, {"step": 52400, "loss": 0.20922}, {"step": 52600, "loss": 0.21513}, {"step": 52800, "loss": 0.21539}, {"step": 53000, "loss": 0.21674}, {"step": 53200, "loss": 0.21399}, {"step": 53400, "loss": 0.20976}, {"step": 53600, "loss": 0.21346}, {"step": 53800, "loss": 0.21822}, {"step": 54000, "loss": 0.21247}, {"step": 54200, "loss": 0.20768}, {"step": 54400, "loss": 0.2015}, {"step": 54600, "loss": 0.21109}, {"step": 54800, "loss": 0.21233}, {"step": 55000, "loss": 0.2125}, {"step": 55200, "loss": 0.20904}, {"step": 55400, "loss": 0.21749}, {"step": 55600, "loss": 0.20581}, {"step": 55800, "loss": 0.21163}, {"step": 56000, "loss": 0.21187}, {"step": 56200, "loss": 0.21497}, {"step": 56400, "loss": 0.21746}, {"step": 56600, "loss": 0.20646}, {"step": 56800, "loss": 0.21248}, {"step": 57000, "loss": 0.21102}, {"step": 57200, "loss": 0.20974}, {"step": 57400, "loss": 0.20964}, {"step": 57600, "loss": 0.20595}, {"step": 57800, "loss": 0.2159}, {"step": 58000, "loss": 0.20676}, {"step": 58200, "loss": 0.20252}, {"step": 58400, "loss": 0.20822}, {"step": 58600, "loss": 0.21211}, {"step": 58800, "loss": 0.21429}, {"step": 59000, "loss": 0.20916}, {"step": 59200, "loss": 0.21819}, {"step": 59400, "loss": 0.20684}, {"step": 59600, "loss": 0.21019}, {"step": 59800, "loss": 0.20439}, {"step": 60000, "loss": 0.21263}, {"step": 60200, "loss": 0.21664}, {"step": 60400, "loss": 0.21287}, {"step": 60600, "loss": 0.20666}, {"step": 60800, "loss": 0.19698}, {"step": 61000, "loss": 0.20939}, {"step": 61200, "loss": 0.21306}, {"step": 61400, "loss": 0.20791}, {"step": 61600, "loss": 0.21108}, {"step": 61800, "loss": 0.20847}, {"step": 62000, "loss": 0.20297}, {"step": 62200, "loss": 0.20419}, {"step": 62400, "loss": 0.20925}, {"step": 62600, "loss": 0.20441}, {"step": 62800, "loss": 0.20932}, {"step": 63000, "loss": 0.21867}, {"step": 63200, "loss": 0.20856}, {"step": 63400, "loss": 0.20547}, {"step": 63600, "loss": 0.21431}, {"step": 63800, "loss": 0.20796}, {"step": 64000, "loss": 0.21381}, {"step": 64200, "loss": 0.20728}, {"step": 64400, "loss": 0.2092}, {"step": 64600, "loss": 0.20641}, {"step": 64800, "loss": 0.21348}, {"step": 65000, "loss": 0.20826}, {"step": 65200, "loss": 0.20804}, {"step": 65400, "loss": 0.21268}, {"step": 65600, "loss": 0.21235}, {"step": 65800, "loss": 0.20219}, {"step": 66000, "loss": 0.21099}, {"step": 66200, "loss": 0.20467}, {"step": 66400, "loss": 0.21673}, {"step": 66600, "loss": 0.20512}, {"step": 66800, "loss": 0.20239}, {"step": 67000, "loss": 0.2002}, {"step": 67200, "loss": 0.20985}, {"step": 67400, "loss": 0.21071}, {"step": 67600, "loss": 0.20923}, {"step": 67800, "loss": 0.21354}, {"step": 68000, "loss": 0.20531}, {"step": 68200, "loss": 0.21289}, {"step": 68400, "loss": 0.2139}, {"step": 68600, "loss": 0.21042}, {"step": 68800, "loss": 0.20175}, {"step": 69000, "loss": 0.20441}, {"step": 69200, "loss": 0.20788}, {"step": 69400, "loss": 0.21005}, {"step": 69600, "loss": 0.2057}, {"step": 69800, "loss": 0.20287}, {"step": 70000, "loss": 0.20605}, {"step": 70200, "loss": 0.20747}, {"step": 70400, "loss": 0.21506}, {"step": 70600, "loss": 0.20614}, {"step": 70800, "loss": 0.20786}, {"step": 71000, "loss": 0.20515}, {"step": 71200, "loss": 0.21405}, {"step": 71400, "loss": 0.20394}, {"step": 71600, "loss": 0.20922}, {"step": 71800, "loss": 0.20328}, {"step": 72000, "loss": 0.21172}, {"step": 72200, "loss": 0.20929}, {"step": 72400, "loss": 0.2044}, {"step": 72600, "loss": 0.20179}, {"step": 72800, "loss": 0.20431}, {"step": 73000, "loss": 0.19757}, {"step": 73200, "loss": 0.20917}, {"step": 73400, "loss": 0.21102}, {"step": 73600, "loss": 0.20987}, {"step": 73800, "loss": 0.21174}, {"step": 74000, "loss": 0.20838}, {"step": 74200, "loss": 0.20255}, {"step": 74400, "loss": 0.20783}, {"step": 74600, "loss": 0.2135}, {"step": 74800, "loss": 0.20648}, {"step": 75000, "loss": 0.20684}, {"step": 75200, "loss": 0.20992}, {"step": 75400, "loss": 0.21488}, {"step": 75600, "loss": 0.20522}, {"step": 75800, "loss": 0.21464}, {"step": 76000, "loss": 0.21044}, {"step": 76200, "loss": 0.21035}, {"step": 76400, "loss": 0.21525}, {"step": 76600, "loss": 0.20574}, {"step": 76800, "loss": 0.19563}, {"step": 77000, "loss": 0.20498}, {"step": 77200, "loss": 0.2129}, {"step": 77400, "loss": 0.20609}, {"step": 77600, "loss": 0.21126}, {"step": 77800, "loss": 0.2082}, {"step": 78000, "loss": 0.20013}, {"step": 78200, "loss": 0.20527}, {"step": 78400, "loss": 0.20461}, {"step": 78600, "loss": 0.20768}, {"step": 78800, "loss": 0.21032}, {"step": 79000, "loss": 0.20857}, {"step": 79200, "loss": 0.21011}, {"step": 79400, "loss": 0.20666}, {"step": 79600, "loss": 0.19954}, {"step": 79800, "loss": 0.21064}, {"step": 80000, "loss": 0.19761}, {"step": 80200, "loss": 0.20241}, {"step": 80400, "loss": 0.20657}, {"step": 80600, "loss": 0.20749}, {"step": 80800, "loss": 0.20282}, {"step": 81000, "loss": 0.20974}, {"step": 81200, "loss": 0.20695}, {"step": 81400, "loss": 0.19759}, {"step": 81600, "loss": 0.20155}, {"step": 81800, "loss": 0.20621}, {"step": 82000, "loss": 0.20686}, {"step": 82200, "loss": 0.20751}, {"step": 82400, "loss": 0.20404}, {"step": 82600, "loss": 0.20858}, {"step": 82800, "loss": 0.21073}, {"step": 83000, "loss": 0.20689}, {"step": 83200, "loss": 0.19859}, {"step": 83400, "loss": 0.20941}, {"step": 83600, "loss": 0.20272}, {"step": 83800, "loss": 0.20885}, {"step": 84000, "loss": 0.20461}, {"step": 84200, "loss": 0.19682}, {"step": 84400, "loss": 0.2065}, {"step": 84600, "loss": 0.20283}, {"step": 84800, "loss": 0.20716}, {"step": 85000, "loss": 0.20843}, {"step": 85200, "loss": 0.20444}, {"step": 85400, "loss": 0.20707}, {"step": 85600, "loss": 0.21347}, {"step": 85800, "loss": 0.20545}, {"step": 86000, "loss": 0.20555}, {"step": 86200, "loss": 0.20865}, {"step": 86400, "loss": 0.20794}, {"step": 86600, "loss": 0.21058}, {"step": 86800, "loss": 0.20167}, {"step": 87000, "loss": 0.19963}, {"step": 87200, "loss": 0.20314}, {"step": 87400, "loss": 0.19919}, {"step": 87600, "loss": 0.20751}, {"step": 87800, "loss": 0.19907}, {"step": 88000, "loss": 0.20274}, {"step": 88200, "loss": 0.20274}, {"step": 88400, "loss": 0.20769}, {"step": 88600, "loss": 0.20108}, {"step": 88800, "loss": 0.20453}, {"step": 89000, "loss": 0.20002}, {"step": 89200, "loss": 0.20686}, {"step": 89400, "loss": 0.2017}, {"step": 89600, "loss": 0.20707}, {"step": 89800, "loss": 0.20438}, {"step": 90000, "loss": 0.21309}, {"step": 90200, "loss": 0.20971}, {"step": 90400, "loss": 0.2017}, {"step": 90600, "loss": 0.19874}, {"step": 90800, "loss": 0.20071}, {"step": 91000, "loss": 0.20359}, {"step": 91200, "loss": 0.20275}, {"step": 91400, "loss": 0.20667}, {"step": 91600, "loss": 0.20714}, {"step": 91800, "loss": 0.19687}, {"step": 92000, "loss": 0.20123}, {"step": 92200, "loss": 0.1975}, {"step": 92400, "loss": 0.19682}, {"step": 92600, "loss": 0.20675}, {"step": 92800, "loss": 0.20061}, {"step": 93000, "loss": 0.20845}, {"step": 93200, "loss": 0.20633}, {"step": 93400, "loss": 0.20795}, {"step": 93600, "loss": 0.20538}, {"step": 93800, "loss": 0.20182}, {"step": 94000, "loss": 0.20218}, {"step": 94200, "loss": 0.20079}, {"step": 94400, "loss": 0.20007}, {"step": 94600, "loss": 0.20447}, {"step": 94800, "loss": 0.20715}, {"step": 95000, "loss": 0.20161}, {"step": 95200, "loss": 0.20014}, {"step": 95400, "loss": 0.19947}, {"step": 95600, "loss": 0.19708}, {"step": 95800, "loss": 0.20476}, {"step": 96000, "loss": 0.21494}, {"step": 96200, "loss": 0.20381}, {"step": 96400, "loss": 0.20642}, {"step": 96600, "loss": 0.19838}, {"step": 96800, "loss": 0.19934}, {"step": 97000, "loss": 0.20103}, {"step": 97200, "loss": 0.20151}, {"step": 97400, "loss": 0.19007}, {"step": 97600, "loss": 0.20875}, {"step": 97800, "loss": 0.20405}, {"step": 98000, "loss": 0.20137}, {"step": 98200, "loss": 0.21318}, {"step": 98400, "loss": 0.20163}, {"step": 98600, "loss": 0.20161}, {"step": 98800, "loss": 0.21268}, {"step": 99000, "loss": 0.20501}, {"step": 99200, "loss": 0.20166}, {"step": 99400, "loss": 0.21209}, {"step": 99600, "loss": 0.19937}, {"step": 99800, "loss": 0.21011}, {"step": 100000, "loss": 0.199}, {"step": 100200, "loss": 0.20153}, {"step": 100400, "loss": 0.20357}, {"step": 100600, "loss": 0.20268}, {"step": 100800, "loss": 0.2025}, {"step": 101000, "loss": 0.19542}, {"step": 101200, "loss": 0.20501}, {"step": 101400, "loss": 0.20519}, {"step": 101600, "loss": 0.20164}, {"step": 101800, "loss": 0.20106}, {"step": 102000, "loss": 0.2044}, {"step": 102200, "loss": 0.19518}, {"step": 102400, "loss": 0.20046}, {"step": 102600, "loss": 0.20598}, {"step": 102800, "loss": 0.20173}, {"step": 103000, "loss": 0.21963}, {"step": 103200, "loss": 0.1973}, {"step": 103400, "loss": 0.20412}, {"step": 103600, "loss": 0.20413}, {"step": 103800, "loss": 0.2022}, {"step": 104000, "loss": 0.20313}, {"step": 104200, "loss": 0.2042}, {"step": 104400, "loss": 0.1994}, {"step": 104600, "loss": 0.20076}, {"step": 104800, "loss": 0.20536}, {"step": 105000, "loss": 0.20122}, {"step": 105200, "loss": 0.20336}, {"step": 105400, "loss": 0.20305}, {"step": 105600, "loss": 0.20012}, {"step": 105800, "loss": 0.20057}, {"step": 106000, "loss": 0.19932}, {"step": 106200, "loss": 0.1993}, {"step": 106400, "loss": 0.20665}, {"step": 106600, "loss": 0.20538}, {"step": 106800, "loss": 0.20759}, {"step": 107000, "loss": 0.19781}, {"step": 107200, "loss": 0.19772}, {"step": 107400, "loss": 0.19548}, {"step": 107600, "loss": 0.19779}, {"step": 107800, "loss": 0.20029}, {"step": 108000, "loss": 0.20068}, {"step": 108200, "loss": 0.20677}, {"step": 108400, "loss": 0.20013}, {"step": 108600, "loss": 0.21102}, {"step": 108800, "loss": 0.19745}, {"step": 109000, "loss": 0.20108}, {"step": 109200, "loss": 0.20079}, {"step": 109400, "loss": 0.19772}, {"step": 109600, "loss": 0.20375}, {"step": 109800, "loss": 0.20034}, {"step": 110000, "loss": 0.19115}, {"step": 110200, "loss": 0.19807}, {"step": 110400, "loss": 0.19907}, {"step": 110600, "loss": 0.19468}, {"step": 110800, "loss": 0.20452}, {"step": 111000, "loss": 0.20477}, {"step": 111200, "loss": 0.2038}, {"step": 111400, "loss": 0.19919}, {"step": 111600, "loss": 0.20367}, {"step": 111800, "loss": 0.19618}, {"step": 112000, "loss": 0.20001}, {"step": 112200, "loss": 0.19395}, {"step": 112400, "loss": 0.1958}, {"step": 112600, "loss": 0.20393}, {"step": 112800, "loss": 0.19812}, {"step": 113000, "loss": 0.19932}, {"step": 113200, "loss": 0.20011}, {"step": 113400, "loss": 0.20299}, {"step": 113600, "loss": 0.20211}, {"step": 113800, "loss": 0.19967}, {"step": 114000, "loss": 0.19908}, {"step": 114200, "loss": 0.20454}, {"step": 114400, "loss": 0.19779}, {"step": 114600, "loss": 0.1993}, {"step": 114800, "loss": 0.20473}, {"step": 115000, "loss": 0.20042}, {"step": 115200, "loss": 0.20259}, {"step": 115400, "loss": 0.19457}, {"step": 115600, "loss": 0.20231}, {"step": 115800, "loss": 0.19649}, {"step": 116000, "loss": 0.19811}, {"step": 116200, "loss": 0.19489}, {"step": 116400, "loss": 0.20477}, {"step": 116600, "loss": 0.19791}, {"step": 116800, "loss": 0.20185}, {"step": 117000, "loss": 0.18904}, {"step": 117200, "loss": 0.19985}, {"step": 117400, "loss": 0.19697}, {"step": 117600, "loss": 0.20094}, {"step": 117800, "loss": 0.20407}, {"step": 118000, "loss": 0.20239}, {"step": 118200, "loss": 0.19311}, {"step": 118400, "loss": 0.20377}, {"step": 118600, "loss": 0.19909}, {"step": 118800, "loss": 0.19822}, {"step": 119000, "loss": 0.20255}, {"step": 119200, "loss": 0.19774}, {"step": 119400, "loss": 0.19718}, {"step": 119600, "loss": 0.2018}, {"step": 119800, "loss": 0.20104}, {"step": 120000, "loss": 0.20634}, {"step": 120200, "loss": 0.19436}, {"step": 120400, "loss": 0.20061}, {"step": 120600, "loss": 0.19561}, {"step": 120800, "loss": 0.20169}, {"step": 121000, "loss": 0.2022}, {"step": 121200, "loss": 0.19578}, {"step": 121400, "loss": 0.1999}, {"step": 121600, "loss": 0.20152}, {"step": 121800, "loss": 0.20472}, {"step": 122000, "loss": 0.19969}, {"step": 122200, "loss": 0.20162}, {"step": 122400, "loss": 0.19948}, {"step": 122600, "loss": 0.20061}, {"step": 122800, "loss": 0.20269}, {"step": 123000, "loss": 0.19008}, {"step": 123200, "loss": 0.19541}, {"step": 123400, "loss": 0.19798}, {"step": 123600, "loss": 0.19976}, {"step": 123800, "loss": 0.19955}, {"step": 124000, "loss": 0.20031}, {"step": 124200, "loss": 0.19991}, {"step": 124400, "loss": 0.20322}, {"step": 124600, "loss": 0.19473}, {"step": 124800, "loss": 0.1956}, {"step": 125000, "loss": 0.19326}, {"step": 125200, "loss": 0.20008}, {"step": 125400, "loss": 0.20485}, {"step": 125600, "loss": 0.20006}, {"step": 125800, "loss": 0.20167}, {"step": 126000, "loss": 0.19627}, {"step": 126200, "loss": 0.19494}, {"step": 126400, "loss": 0.19858}, {"step": 126600, "loss": 0.19937}, {"step": 126800, "loss": 0.19604}, {"step": 127000, "loss": 0.19911}, {"step": 127200, "loss": 0.19634}, {"step": 127400, "loss": 0.19638}, {"step": 127600, "loss": 0.19856}, {"step": 127800, "loss": 0.20178}, {"step": 128000, "loss": 0.1931}, {"step": 128200, "loss": 0.20352}, {"step": 128400, "loss": 0.19713}, {"step": 128600, "loss": 0.20198}, {"step": 128800, "loss": 0.19823}, {"step": 129000, "loss": 0.20178}, {"step": 129200, "loss": 0.19836}, {"step": 129400, "loss": 0.20125}, {"step": 129600, "loss": 0.19984}, {"step": 129800, "loss": 0.19486}, {"step": 130000, "loss": 0.20316}, {"step": 130200, "loss": 0.19653}, {"step": 130400, "loss": 0.20136}, {"step": 130600, "loss": 0.19551}, {"step": 130800, "loss": 0.19882}, {"step": 131000, "loss": 0.20018}, {"step": 131200, "loss": 0.19994}, {"step": 131400, "loss": 0.1982}, {"step": 131600, "loss": 0.2021}, {"step": 131800, "loss": 0.19422}, {"step": 132000, "loss": 0.1929}, {"step": 132200, "loss": 0.19819}, {"step": 132400, "loss": 0.20218}, {"step": 132600, "loss": 0.20185}, {"step": 132800, "loss": 0.19909}, {"step": 133000, "loss": 0.20312}, {"step": 133200, "loss": 0.20016}, {"step": 133400, "loss": 0.20188}, {"step": 133600, "loss": 0.20305}, {"step": 133800, "loss": 0.20325}, {"step": 134000, "loss": 0.19429}, {"step": 134200, "loss": 0.20248}, {"step": 134400, "loss": 0.19967}, {"step": 134600, "loss": 0.20026}, {"step": 134800, "loss": 0.20531}, {"step": 135000, "loss": 0.19879}, {"step": 135200, "loss": 0.19695}, {"step": 135400, "loss": 0.19637}, {"step": 135600, "loss": 0.20336}, {"step": 135800, "loss": 0.20153}, {"step": 136000, "loss": 0.19111}, {"step": 136200, "loss": 0.2021}, {"step": 136400, "loss": 0.19292}, {"step": 136600, "loss": 0.19903}, {"step": 136800, "loss": 0.19429}, {"step": 137000, "loss": 0.20093}, {"step": 137200, "loss": 0.19908}, {"step": 137400, "loss": 0.19358}, {"step": 137600, "loss": 0.19911}, {"step": 137800, "loss": 0.20166}, {"step": 138000, "loss": 0.18948}, {"step": 138200, "loss": 0.19163}], "eval": [{"step": 5000, "loss": 0.39224}, {"step": 10000, "loss": 0.29058}, {"step": 15000, "loss": 0.25387}, {"step": 20000, "loss": 0.24405}, {"step": 25000, "loss": 0.23168}, {"step": 30000, "loss": 0.22268}, {"step": 35000, "loss": 0.21808}, {"step": 40000, "loss": 0.21515}, {"step": 45000, "loss": 0.21936}, {"step": 50000, "loss": 0.21015}, {"step": 55000, "loss": 0.20976}, {"step": 60000, "loss": 0.21071}, {"step": 65000, "loss": 0.20907}, {"step": 70000, "loss": 0.20656}, {"step": 75000, "loss": 0.2058}, {"step": 80000, "loss": 0.20301}, {"step": 85000, "loss": 0.20323}, {"step": 90000, "loss": 0.20179}, {"step": 95000, "loss": 0.20067}, {"step": 100000, "loss": 0.20269}, {"step": 105000, "loss": 0.19888}, {"step": 110000, "loss": 0.19932}, {"step": 115000, "loss": 0.20113}, {"step": 120000, "loss": 0.2008}, {"step": 125000, "loss": 0.20131}, {"step": 130000, "loss": 0.19927}, {"step": 135000, "loss": 0.2028}, {"step": 138392, "loss": 0.19827}], "best": 0.19826915860176086, "total_steps": 138392, "stopped": 138392, "runtime_s": 18560, "baseline": 2.3427}, "vgene": {"train": [{"step": 200, "loss": 2.27707}, {"step": 400, "loss": 1.838}, {"step": 600, "loss": 1.27454}, {"step": 800, "loss": 1.04093}, {"step": 1000, "loss": 0.89924}, {"step": 1200, "loss": 0.82494}, {"step": 1400, "loss": 0.76428}, {"step": 1600, "loss": 0.68696}, {"step": 1800, "loss": 0.66812}, {"step": 2000, "loss": 0.61596}, {"step": 2200, "loss": 0.59702}, {"step": 2400, "loss": 0.57388}, {"step": 2600, "loss": 0.53247}, {"step": 2800, "loss": 0.53548}, {"step": 3000, "loss": 0.50831}, {"step": 3200, "loss": 0.48949}, {"step": 3400, "loss": 0.46619}, {"step": 3600, "loss": 0.45379}, {"step": 3800, "loss": 0.45261}, {"step": 4000, "loss": 0.44418}, {"step": 4200, "loss": 0.41646}, {"step": 4400, "loss": 0.4229}, {"step": 4600, "loss": 0.40929}, {"step": 4800, "loss": 0.39672}, {"step": 5000, "loss": 0.38148}, {"step": 5200, "loss": 0.37649}, {"step": 5400, "loss": 0.37432}, {"step": 5600, "loss": 0.37019}, {"step": 5800, "loss": 0.3662}, {"step": 6000, "loss": 0.3522}, {"step": 6200, "loss": 0.34782}, {"step": 6400, "loss": 0.34506}, {"step": 6600, "loss": 0.34498}, {"step": 6800, "loss": 0.34009}, {"step": 7000, "loss": 0.33423}, {"step": 7200, "loss": 0.32563}, {"step": 7400, "loss": 0.31771}, {"step": 7600, "loss": 0.32501}, {"step": 7800, "loss": 0.31664}, {"step": 8000, "loss": 0.3024}, {"step": 8200, "loss": 0.30541}, {"step": 8400, "loss": 0.30516}, {"step": 8600, "loss": 0.29416}, {"step": 8800, "loss": 0.29998}, {"step": 9000, "loss": 0.29205}, {"step": 9200, "loss": 0.29373}, {"step": 9400, "loss": 0.2896}, {"step": 9600, "loss": 0.2895}, {"step": 9800, "loss": 0.29518}, {"step": 10000, "loss": 0.28354}, {"step": 10200, "loss": 0.28867}, {"step": 10400, "loss": 0.27634}, {"step": 10600, "loss": 0.27979}, {"step": 10800, "loss": 0.28238}, {"step": 11000, "loss": 0.26628}, {"step": 11200, "loss": 0.26931}, {"step": 11400, "loss": 0.27341}, {"step": 11600, "loss": 0.27038}, {"step": 11800, "loss": 0.28275}, {"step": 12000, "loss": 0.27058}, {"step": 12200, "loss": 0.27151}, {"step": 12400, "loss": 0.2607}, {"step": 12600, "loss": 0.26197}, {"step": 12800, "loss": 0.26829}, {"step": 13000, "loss": 0.25831}, {"step": 13200, "loss": 0.25518}, {"step": 13400, "loss": 0.25874}, {"step": 13600, "loss": 0.2552}, {"step": 13800, "loss": 0.26363}, {"step": 14000, "loss": 0.25827}, {"step": 14200, "loss": 0.25411}, {"step": 14400, "loss": 0.25525}, {"step": 14600, "loss": 0.25507}, {"step": 14800, "loss": 0.2451}, {"step": 15000, "loss": 0.25115}, {"step": 15200, "loss": 0.24999}, {"step": 15400, "loss": 0.24605}, {"step": 15600, "loss": 0.25618}, {"step": 15800, "loss": 0.2466}, {"step": 16000, "loss": 0.2464}, {"step": 16200, "loss": 0.24856}, {"step": 16400, "loss": 0.24647}, {"step": 16600, "loss": 0.24655}, {"step": 16800, "loss": 0.24709}, {"step": 17000, "loss": 0.24658}, {"step": 17200, "loss": 0.24619}, {"step": 17400, "loss": 0.23924}, {"step": 17600, "loss": 0.24359}, {"step": 17800, "loss": 0.24507}, {"step": 18000, "loss": 0.24216}, {"step": 18200, "loss": 0.23946}, {"step": 18400, "loss": 0.24225}, {"step": 18600, "loss": 0.23864}, {"step": 18800, "loss": 0.24208}, {"step": 19000, "loss": 0.23652}, {"step": 19200, "loss": 0.24256}, {"step": 19400, "loss": 0.23774}, {"step": 19600, "loss": 0.23149}, {"step": 19800, "loss": 0.23498}, {"step": 20000, "loss": 0.23158}, {"step": 20200, "loss": 0.23631}, {"step": 20400, "loss": 0.22923}, {"step": 20600, "loss": 0.23779}, {"step": 20800, "loss": 0.23814}, {"step": 21000, "loss": 0.23595}, {"step": 21200, "loss": 0.22553}, {"step": 21400, "loss": 0.23481}, {"step": 21600, "loss": 0.23208}, {"step": 21800, "loss": 0.22992}, {"step": 22000, "loss": 0.23381}, {"step": 22200, "loss": 0.22627}, {"step": 22400, "loss": 0.23261}, {"step": 22600, "loss": 0.22557}, {"step": 22800, "loss": 0.22782}, {"step": 23000, "loss": 0.23475}, {"step": 23200, "loss": 0.2388}, {"step": 23400, "loss": 0.242}, {"step": 23600, "loss": 0.22695}, {"step": 23800, "loss": 0.23433}, {"step": 24000, "loss": 0.22525}, {"step": 24200, "loss": 0.21981}, {"step": 24400, "loss": 0.23488}, {"step": 24600, "loss": 0.22563}, {"step": 24800, "loss": 0.22633}, {"step": 25000, "loss": 0.22362}, {"step": 25200, "loss": 0.23077}, {"step": 25400, "loss": 0.23373}, {"step": 25600, "loss": 0.23043}, {"step": 25800, "loss": 0.22151}, {"step": 26000, "loss": 0.22283}, {"step": 26200, "loss": 0.2302}, {"step": 26400, "loss": 0.22537}, {"step": 26600, "loss": 0.22156}, {"step": 26800, "loss": 0.22438}, {"step": 27000, "loss": 0.22827}, {"step": 27200, "loss": 0.22606}, {"step": 27400, "loss": 0.21861}, {"step": 27600, "loss": 0.2265}, {"step": 27800, "loss": 0.2265}, {"step": 28000, "loss": 0.2194}, {"step": 28200, "loss": 0.2368}, {"step": 28400, "loss": 0.22926}, {"step": 28600, "loss": 0.2267}, {"step": 28800, "loss": 0.21483}, {"step": 29000, "loss": 0.22816}, {"step": 29200, "loss": 0.22478}, {"step": 29400, "loss": 0.21846}, {"step": 29600, "loss": 0.22162}, {"step": 29800, "loss": 0.22431}, {"step": 30000, "loss": 0.22967}, {"step": 30200, "loss": 0.22071}, {"step": 30400, "loss": 0.22923}, {"step": 30600, "loss": 0.21907}, {"step": 30800, "loss": 0.22597}, {"step": 31000, "loss": 0.22421}, {"step": 31200, "loss": 0.22061}, {"step": 31400, "loss": 0.22382}, {"step": 31600, "loss": 0.22196}, {"step": 31800, "loss": 0.22162}, {"step": 32000, "loss": 0.22015}, {"step": 32200, "loss": 0.21273}, {"step": 32400, "loss": 0.2211}, {"step": 32600, "loss": 0.22058}, {"step": 32800, "loss": 0.22268}, {"step": 33000, "loss": 0.2199}, {"step": 33200, "loss": 0.22432}, {"step": 33400, "loss": 0.22055}, {"step": 33600, "loss": 0.22159}, {"step": 33800, "loss": 0.21284}, {"step": 34000, "loss": 0.21528}, {"step": 34200, "loss": 0.22384}, {"step": 34400, "loss": 0.21602}, {"step": 34600, "loss": 0.21885}, {"step": 34800, "loss": 0.2253}, {"step": 35000, "loss": 0.22171}, {"step": 35200, "loss": 0.22155}, {"step": 35400, "loss": 0.2223}, {"step": 35600, "loss": 0.21753}, {"step": 35800, "loss": 0.21179}, {"step": 36000, "loss": 0.22036}, {"step": 36200, "loss": 0.22049}, {"step": 36400, "loss": 0.2199}, {"step": 36600, "loss": 0.21249}, {"step": 36800, "loss": 0.21963}, {"step": 37000, "loss": 0.21431}, {"step": 37200, "loss": 0.20959}, {"step": 37400, "loss": 0.21763}, {"step": 37600, "loss": 0.22106}, {"step": 37800, "loss": 0.21354}, {"step": 38000, "loss": 0.21368}, {"step": 38200, "loss": 0.2172}, {"step": 38400, "loss": 0.2171}, {"step": 38600, "loss": 0.21826}, {"step": 38800, "loss": 0.21318}, {"step": 39000, "loss": 0.22263}, {"step": 39200, "loss": 0.21188}, {"step": 39400, "loss": 0.22095}, {"step": 39600, "loss": 0.21983}, {"step": 39800, "loss": 0.21526}, {"step": 40000, "loss": 0.20853}, {"step": 40200, "loss": 0.22464}, {"step": 40400, "loss": 0.20966}, {"step": 40600, "loss": 0.21735}, {"step": 40800, "loss": 0.21773}, {"step": 41000, "loss": 0.21684}, {"step": 41200, "loss": 0.21621}, {"step": 41400, "loss": 0.21214}, {"step": 41600, "loss": 0.21725}, {"step": 41800, "loss": 0.21317}, {"step": 42000, "loss": 0.21811}, {"step": 42200, "loss": 0.20669}, {"step": 42400, "loss": 0.21596}, {"step": 42600, "loss": 0.21648}, {"step": 42800, "loss": 0.20604}, {"step": 43000, "loss": 0.20848}, {"step": 43200, "loss": 0.2149}, {"step": 43400, "loss": 0.21009}, {"step": 43600, "loss": 0.209}, {"step": 43800, "loss": 0.21404}, {"step": 44000, "loss": 0.2103}, {"step": 44200, "loss": 0.21584}, {"step": 44400, "loss": 0.22051}, {"step": 44600, "loss": 0.21616}, {"step": 44800, "loss": 0.21802}, {"step": 45000, "loss": 0.21881}, {"step": 45200, "loss": 0.21671}, {"step": 45400, "loss": 0.21016}, {"step": 45600, "loss": 0.21244}, {"step": 45800, "loss": 0.21423}, {"step": 46000, "loss": 0.21265}, {"step": 46200, "loss": 0.21352}, {"step": 46400, "loss": 0.21259}, {"step": 46600, "loss": 0.21547}, {"step": 46800, "loss": 0.21174}, {"step": 47000, "loss": 0.21805}, {"step": 47200, "loss": 0.2101}, {"step": 47400, "loss": 0.2088}, {"step": 47600, "loss": 0.20956}, {"step": 47800, "loss": 0.20962}, {"step": 48000, "loss": 0.20576}, {"step": 48200, "loss": 0.21342}, {"step": 48400, "loss": 0.21018}, {"step": 48600, "loss": 0.20693}, {"step": 48800, "loss": 0.20707}, {"step": 49000, "loss": 0.20982}, {"step": 49200, "loss": 0.21251}, {"step": 49400, "loss": 0.20695}, {"step": 49600, "loss": 0.216}, {"step": 49800, "loss": 0.20492}, {"step": 50000, "loss": 0.2079}, {"step": 50200, "loss": 0.20336}, {"step": 50400, "loss": 0.21333}, {"step": 50600, "loss": 0.20907}, {"step": 50800, "loss": 0.21168}, {"step": 51000, "loss": 0.20923}, {"step": 51200, "loss": 0.20791}, {"step": 51400, "loss": 0.20927}, {"step": 51600, "loss": 0.21388}, {"step": 51800, "loss": 0.20646}, {"step": 52000, "loss": 0.20722}, {"step": 52200, "loss": 0.20222}, {"step": 52400, "loss": 0.20939}, {"step": 52600, "loss": 0.21715}, {"step": 52800, "loss": 0.20575}, {"step": 53000, "loss": 0.213}, {"step": 53200, "loss": 0.20474}, {"step": 53400, "loss": 0.20916}, {"step": 53600, "loss": 0.2068}, {"step": 53800, "loss": 0.21428}, {"step": 54000, "loss": 0.20964}, {"step": 54200, "loss": 0.2046}, {"step": 54400, "loss": 0.20329}, {"step": 54600, "loss": 0.21618}, {"step": 54800, "loss": 0.20812}, {"step": 55000, "loss": 0.21176}, {"step": 55200, "loss": 0.21122}, {"step": 55400, "loss": 0.2102}, {"step": 55600, "loss": 0.20796}, {"step": 55800, "loss": 0.20478}, {"step": 56000, "loss": 0.21511}, {"step": 56200, "loss": 0.21389}, {"step": 56400, "loss": 0.19994}, {"step": 56600, "loss": 0.20764}, {"step": 56800, "loss": 0.20309}, {"step": 57000, "loss": 0.21135}, {"step": 57200, "loss": 0.20629}, {"step": 57400, "loss": 0.21301}, {"step": 57600, "loss": 0.20669}, {"step": 57800, "loss": 0.20696}, {"step": 58000, "loss": 0.20669}, {"step": 58200, "loss": 0.20841}, {"step": 58400, "loss": 0.20665}, {"step": 58600, "loss": 0.21009}, {"step": 58800, "loss": 0.20176}, {"step": 59000, "loss": 0.20579}, {"step": 59200, "loss": 0.20735}, {"step": 59400, "loss": 0.2024}, {"step": 59600, "loss": 0.20534}, {"step": 59800, "loss": 0.20504}, {"step": 60000, "loss": 0.21177}, {"step": 60200, "loss": 0.203}, {"step": 60400, "loss": 0.21139}, {"step": 60600, "loss": 0.21382}, {"step": 60800, "loss": 0.19439}, {"step": 61000, "loss": 0.2083}, {"step": 61200, "loss": 0.21117}, {"step": 61400, "loss": 0.20983}, {"step": 61600, "loss": 0.21201}, {"step": 61800, "loss": 0.20754}, {"step": 62000, "loss": 0.2091}, {"step": 62200, "loss": 0.20605}, {"step": 62400, "loss": 0.19454}, {"step": 62600, "loss": 0.20864}, {"step": 62800, "loss": 0.20465}, {"step": 63000, "loss": 0.20526}, {"step": 63200, "loss": 0.20362}, {"step": 63400, "loss": 0.19803}, {"step": 63600, "loss": 0.20946}, {"step": 63800, "loss": 0.2073}, {"step": 64000, "loss": 0.20566}, {"step": 64200, "loss": 0.20354}, {"step": 64400, "loss": 0.19625}, {"step": 64600, "loss": 0.2031}, {"step": 64800, "loss": 0.2016}, {"step": 65000, "loss": 0.20262}, {"step": 65200, "loss": 0.21188}, {"step": 65400, "loss": 0.20353}, {"step": 65600, "loss": 0.20337}, {"step": 65800, "loss": 0.20316}, {"step": 66000, "loss": 0.2078}, {"step": 66200, "loss": 0.2022}, {"step": 66400, "loss": 0.21302}, {"step": 66600, "loss": 0.21067}, {"step": 66800, "loss": 0.21237}, {"step": 67000, "loss": 0.20366}, {"step": 67200, "loss": 0.20729}, {"step": 67400, "loss": 0.20308}, {"step": 67600, "loss": 0.19859}, {"step": 67800, "loss": 0.20745}, {"step": 68000, "loss": 0.20678}, {"step": 68200, "loss": 0.19825}, {"step": 68400, "loss": 0.202}, {"step": 68600, "loss": 0.20172}, {"step": 68800, "loss": 0.21015}, {"step": 69000, "loss": 0.20592}, {"step": 69200, "loss": 0.20714}, {"step": 69400, "loss": 0.2069}, {"step": 69600, "loss": 0.20558}, {"step": 69800, "loss": 0.20692}, {"step": 70000, "loss": 0.20722}, {"step": 70200, "loss": 0.20637}, {"step": 70400, "loss": 0.21202}, {"step": 70600, "loss": 0.20806}, {"step": 70800, "loss": 0.20666}, {"step": 71000, "loss": 0.20315}, {"step": 71200, "loss": 0.20974}, {"step": 71400, "loss": 0.20915}, {"step": 71600, "loss": 0.20544}, {"step": 71800, "loss": 0.20244}, {"step": 72000, "loss": 0.20458}, {"step": 72200, "loss": 0.20425}, {"step": 72400, "loss": 0.2087}, {"step": 72600, "loss": 0.20867}, {"step": 72800, "loss": 0.2073}, {"step": 73000, "loss": 0.20106}, {"step": 73200, "loss": 0.20627}, {"step": 73400, "loss": 0.20111}, {"step": 73600, "loss": 0.20041}, {"step": 73800, "loss": 0.20445}, {"step": 74000, "loss": 0.20127}, {"step": 74200, "loss": 0.20097}, {"step": 74400, "loss": 0.20996}, {"step": 74600, "loss": 0.19919}, {"step": 74800, "loss": 0.20087}, {"step": 75000, "loss": 0.20618}, {"step": 75200, "loss": 0.19557}, {"step": 75400, "loss": 0.19834}, {"step": 75600, "loss": 0.19881}, {"step": 75800, "loss": 0.20394}, {"step": 76000, "loss": 0.20291}, {"step": 76200, "loss": 0.20374}, {"step": 76400, "loss": 0.19588}, {"step": 76600, "loss": 0.1965}, {"step": 76800, "loss": 0.20997}, {"step": 77000, "loss": 0.20397}, {"step": 77200, "loss": 0.19318}, {"step": 77400, "loss": 0.2087}, {"step": 77600, "loss": 0.20427}, {"step": 77800, "loss": 0.19983}, {"step": 78000, "loss": 0.19841}, {"step": 78200, "loss": 0.20197}, {"step": 78400, "loss": 0.21054}, {"step": 78600, "loss": 0.20175}, {"step": 78800, "loss": 0.19839}, {"step": 79000, "loss": 0.20121}, {"step": 79200, "loss": 0.20022}, {"step": 79400, "loss": 0.19931}, {"step": 79600, "loss": 0.20027}, {"step": 79800, "loss": 0.19907}, {"step": 80000, "loss": 0.20744}], "eval": [{"step": 5000, "loss": 0.50592}, {"step": 10000, "loss": 0.45046}, {"step": 15000, "loss": 0.43963}, {"step": 20000, "loss": 0.43561}, {"step": 25000, "loss": 0.41555}, {"step": 30000, "loss": 0.40597}, {"step": 35000, "loss": 0.41715}, {"step": 40000, "loss": 0.41319}, {"step": 45000, "loss": 0.40165}, {"step": 50000, "loss": 0.40393}, {"step": 55000, "loss": 0.40786}, {"step": 60000, "loss": 0.39363}, {"step": 65000, "loss": 0.40561}, {"step": 70000, "loss": 0.39565}, {"step": 75000, "loss": 0.40177}, {"step": 80000, "loss": 0.40075}], "best": 0.3936256468296051, "total_steps": 134184, "stopped": 80000, "runtime_s": 9428, "baseline": 2.3519}}</script>
+<script>
+(function () {
+  const D = JSON.parse(document.getElementById('run-data').textContent);
+  const XMAX = 138392;
+
+  const mk = (arr) => arr.map(d => ({ x: d.step, y: d.loss }));
+  const evA = [{ x: 0, y: D.random.baseline }].concat(mk(D.random.eval));
+  const evB = [{ x: 0, y: D.vgene.baseline }].concat(mk(D.vgene.eval));
+  const trA = mk(D.random.train), trB = mk(D.vgene.train);
+
+  const kfmt = v => v === 0 ? '0' : (v / 1000) + 'k';
+
+  function chart(cfg) {
+    const host = document.getElementById(cfg.host);
+    const tip = document.getElementById(cfg.tip);
+    let xs, ys, cur = null;
+
+    function draw() {
+      const W = Math.max(300, host.clientWidth), H = cfg.height, m = cfg.margin;
+      const iw = W - m.l - m.r, ih = H - m.t - m.b;
+      const [x0, x1] = cfg.xDomain, [y0, y1] = cfg.yDomain;
+      xs = v => m.l + (v - x0) / (x1 - x0) * iw;
+      if (cfg.log) { const a = Math.log10(y0), b = Math.log10(y1);
+        ys = v => m.t + ih - (Math.log10(v) - a) / (b - a) * ih;
+      } else { ys = v => m.t + ih - (v - y0) / (y1 - y0) * ih; }
+
+      let s = '';
+      cfg.yTicks.forEach(t => {
+        const y = ys(t);
+        s += `<line class="grid" x1="${m.l}" y1="${y.toFixed(1)}" x2="${(W - m.r).toFixed(1)}" y2="${y.toFixed(1)}"/>`;
+        s += `<text class="tick" x="${m.l - 9}" y="${(y + 3.5).toFixed(1)}" text-anchor="end">${cfg.yFmt(t)}</text>`;
+      });
+      cfg.xTicks.forEach(t => {
+        s += `<text class="tick" x="${xs(t).toFixed(1)}" y="${H - m.b + 17}" text-anchor="middle">${kfmt(t)}</text>`;
+      });
+      s += `<line class="axis" x1="${m.l}" y1="${(m.t + ih).toFixed(1)}" x2="${(W - m.r).toFixed(1)}" y2="${(m.t + ih).toFixed(1)}"/>`;
+      s += `<text class="atitle" x="${m.l}" y="${H - 2}">${cfg.xTitle}</text>`;
+      s += `<text class="atitle" x="${m.l - 9}" y="${m.t - 6}" text-anchor="end">${cfg.yTitle}</text>`;
+
+      // early-stop annotation
+      const ex = xs(cfg.stopAt);
+      s += `<line x1="${ex.toFixed(1)}" y1="${m.t + 6}" x2="${ex.toFixed(1)}" y2="${(m.t + ih).toFixed(1)}" style="stroke:var(--s2)" stroke-width="1" opacity="0.45"/>`;
+      s += `<text class="dlabel" x="${(ex + 6).toFixed(1)}" y="${m.t + 15}" text-anchor="start" style="fill:var(--s2)">early stop</text>`;
+
+      cfg.series.forEach(se => {
+        const pts = se.points.filter(p => p.x >= x0 && p.x <= x1);
+        if (!pts.length) return;
+        const d = pts.map((p, i) => (i ? 'L' : 'M') + xs(p.x).toFixed(1) + ' ' + ys(p.y).toFixed(1)).join(' ');
+        s += `<path d="${d}" fill="none" style="stroke:var(${se.cvar})" stroke-width="${se.w}" stroke-linejoin="round" stroke-linecap="round" opacity="${se.op || 1}"/>`;
+        if (se.markers) pts.forEach(p => {
+          s += `<circle cx="${xs(p.x).toFixed(1)}" cy="${ys(p.y).toFixed(1)}" r="3.6" style="fill:var(${se.cvar});stroke:var(--surface)" stroke-width="2"/>`;
+        });
+      });
+
+      (cfg.labels || []).forEach(L => {
+        s += `<text class="dlabel" x="${(xs(L.x) + L.dx).toFixed(1)}" y="${(ys(L.y) + L.dy).toFixed(1)}" text-anchor="${L.anchor}" style="fill:var(${L.cvar})">${L.text}</text>`;
+      });
+
+      const hov = cfg.series.filter(se => se.hover !== false);
+      s += `<g id="${cfg.host}-cross" style="display:none">
+              <line class="axis" y1="${m.t}" y2="${(m.t + ih).toFixed(1)}" stroke-width="1"/>
+              ${hov.map(se => `<circle r="4.5" style="fill:var(${se.cvar});stroke:var(--surface);display:none" stroke-width="2"/>`).join('')}
+            </g>`;
+
+      host.querySelectorAll('svg').forEach(n => n.remove());
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+      svg.setAttribute('width', W); svg.setAttribute('height', H);
+      svg.setAttribute('role', 'img'); svg.setAttribute('aria-label', cfg.aria);
+      svg.innerHTML = s;
+      host.appendChild(svg);
+      cur = { W, H, m, iw, ih, x0, x1, hov };
+    }
+
+    function nearest(arr, x) {
+      let best = null, bd = Infinity;
+      for (const p of arr) { const d = Math.abs(p.x - x); if (d < bd) { bd = d; best = p; } }
+      return { p: best, d: bd };
+    }
+
+    function move(ev) {
+      if (!cur) return;
+      const r = host.getBoundingClientRect();
+      const px = (ev.clientX - r.left) / r.width * cur.W;
+      if (px < cur.m.l - 4 || px > cur.W - cur.m.r + 4) { leave(); return; }
+      const step = cur.x0 + (px - cur.m.l) / cur.iw * (cur.x1 - cur.x0);
+      const g = document.getElementById(cfg.host + '-cross');
+      if (!g) return;
+      const circles = g.querySelectorAll('circle');
+      const rows = []; let anchorX = null;
+      cur.hov.forEach((se, i) => {
+        const { p, d } = nearest(se.points, step);
+        const c = circles[i];
+        if (p && d <= 3000) {
+          c.setAttribute('cx', xs(p.x)); c.setAttribute('cy', ys(p.y)); c.style.display = '';
+          rows.push(`<div class="r"><i class="dot" style="background:var(${se.cvar})"></i>${se.name} <b style="font-weight:500;margin-left:auto">${p.y.toFixed(4)}</b></div>`);
+          if (anchorX === null) anchorX = xs(p.x);
+        } else { c.style.display = 'none'; }
+      });
+      if (anchorX === null) { leave(); return; }
+      g.style.display = '';
+      g.querySelector('line').setAttribute('x1', anchorX);
+      g.querySelector('line').setAttribute('x2', anchorX);
+      const st = Math.round(step);
+      tip.innerHTML = `<div class="hd">step ${st.toLocaleString()}</div>` + rows.join('');
+      tip.style.opacity = '1';
+      tip.style.left = Math.max(8, Math.min(92, anchorX / cur.W * 100)) + '%';
+      tip.style.top = (cur.m.t + 6) + 'px';
+    }
+
+    function leave() {
+      tip.style.opacity = '0';
+      const g = document.getElementById(cfg.host + '-cross');
+      if (g) g.style.display = 'none';
+    }
+
+    host.addEventListener('mousemove', move);
+    host.addEventListener('mouseleave', leave);
+    draw();
+    return { draw, cfg };
+  }
+
+  const main = chart({
+    host: 'p-main', tip: 't-main', height: 420, margin: { t: 26, r: 82, b: 42, l: 58 },
+    xDomain: [0, XMAX], yDomain: [0.17, 2.6], log: true, stopAt: 80000,
+    yTicks: [0.2, 0.3, 0.5, 1, 2], xTicks: [0, 25000, 50000, 75000, 100000, 125000],
+    yFmt: v => v.toFixed(1),
+    xTitle: 'training step', yTitle: 'loss',
+    aria: 'Validation loss for two runs. The random-split run falls to 0.198; the V-gene-held-out run plateaus near 0.394 and stops at step 80,000.',
+    series: [
+      { name: 'Training (random)', cvar: '--muted', w: 1.2, op: 0.5, points: trA, hover: false },
+      { name: 'Training (V-gene)', cvar: '--muted', w: 1.2, op: 0.5, points: trB, hover: false },
+      { name: 'Random split', cvar: '--s1', w: 2, points: evA, markers: true },
+      { name: 'V-gene held out', cvar: '--s2', w: 2, points: evB, markers: true }
+    ],
+    labels: [
+      { x: XMAX, y: 0.19827, dx: 9, dy: 4, anchor: 'start', text: '0.198', cvar: '--s1' },
+      { x: 80000, y: 0.4008, dx: 9, dy: -8, anchor: 'start', text: '0.401', cvar: '--s2' }
+    ]
+  });
+
+  document.getElementById('b-log').addEventListener('click', () => setScale(true));
+  document.getElementById('b-lin').addEventListener('click', () => setScale(false));
+  function setScale(isLog) {
+    main.cfg.log = isLog;
+    main.cfg.yDomain = isLog ? [0.17, 2.6] : [0, 2.45];
+    main.cfg.yTicks = isLog ? [0.2, 0.3, 0.5, 1, 2] : [0, 0.5, 1, 1.5, 2];
+    document.getElementById('b-log').setAttribute('aria-pressed', String(isLog));
+    document.getElementById('b-lin').setAttribute('aria-pressed', String(!isLog));
+    main.draw();
+  }
+
+  const REC = [
+    { nm: 'Stock ESM-2', note: 'no mouse framework training', v: 20.97, cvar: '--muted' },
+    { nm: 'Random-split model', note: 'trained on these germlines', v: 94.77, cvar: '--s1' },
+    { nm: 'V-gene-split model', note: 'never saw these germlines', v: 90.03, cvar: '--s2' }
+  ];
+  document.getElementById('bars').innerHTML = REC.map(r => `
+    <div class="bar">
+      <div class="top"><span class="nm">${r.nm} <em>(${r.note})</em></span><span class="pc" style="color:var(${r.cvar})">${r.v.toFixed(2)}%</span></div>
+      <div class="track"><div class="fill" style="width:${r.v}%;background:var(${r.cvar})"></div></div>
+    </div>`).join('');
+
+  const byStep = new Map();
+  D.random.eval.forEach(e => byStep.set(e.step, { a: e.loss }));
+  D.vgene.eval.forEach(e => { const o = byStep.get(e.step) || {}; o.b = e.loss; byStep.set(e.step, o); });
+  const steps = [...byStep.keys()].sort((x, y) => x - y);
+  document.getElementById('tbody').innerHTML = steps.map(st => {
+    const { a, b } = byStep.get(st);
+    const diff = (a != null && b != null) ? (b - a).toFixed(4) : 'n/a';
+    return `<tr><td>${st.toLocaleString()}</td>
+      <td>${a != null ? a.toFixed(4) : '<span class="na">n/a</span>'}</td>
+      <td>${b != null ? b.toFixed(4) : '<span class="na">n/a</span>'}</td>
+      <td>${diff === 'n/a' ? '<span class="na">n/a</span>' : '+' + diff}</td></tr>`;
+  }).join('');
+
+  const bt = document.getElementById('b-table'), tw = document.getElementById('tablewrap');
+  bt.addEventListener('click', () => {
+    const open = tw.hidden;
+    tw.hidden = !open;
+    bt.textContent = open ? 'Hide table' : 'Show table';
+    bt.setAttribute('aria-expanded', String(open));
+  });
+
+  let raf;
+  new ResizeObserver(() => {
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(() => main.draw());
+  }).observe(document.body);
+})();
+</script>
+</body>
+</html>

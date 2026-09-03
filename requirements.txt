@@ -1,0 +1,14 @@
+# Tested on macOS (Apple M1, MPS) with Python 3.13.
+# The training script supports both transformers 4.x and 5.x, and detects the
+# eval_strategy / warmup_ratio API changes at runtime.
+
+torch>=2.0
+transformers>=4.40
+datasets>=2.18
+accelerate>=0.28
+pandas>=2.0
+numpy>=1.24
+
+# Versions this project was actually run with:
+#   torch 2.13.0 · transformers 5.16.1 · datasets 5.0.1 · accelerate 1.14.0
+#   pandas 3.0.5 · numpy 2.5.2

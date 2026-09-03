@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#f9f9f7;color:#0b0b0b}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>The Human Antibody Gap</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    color-scheme: light;
+    --plane:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink-2:#52514e; --muted:#898781;
+    --grid:#e1e0d9; --axis:#c3c2b7; --hair:rgba(11,11,11,0.10);
+    --murine:#eda100; --chimeric:#1baf7a; --humanized:#eb6834; --human:#2a78d6;
+    --wash:rgba(42,120,214,0.07); --meter:#d8d7d0;
+    --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --plane:#0d0d0d; --surface:#1a1a19; --ink:#ffffff; --ink-2:#c3c2b7; --muted:#898781;
+      --grid:#2c2c2a; --axis:#383835; --hair:rgba(255,255,255,0.10);
+      --murine:#c98500; --chimeric:#199e70; --humanized:#d95926; --human:#3987e5;
+      --wash:rgba(57,135,229,0.10); --meter:#33332f;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --plane:#0d0d0d; --surface:#1a1a19; --ink:#ffffff; --ink-2:#c3c2b7; --muted:#898781;
+    --grid:#2c2c2a; --axis:#383835; --hair:rgba(255,255,255,0.10);
+    --murine:#c98500; --chimeric:#199e70; --humanized:#d95926; --human:#3987e5;
+    --wash:rgba(57,135,229,0.10); --meter:#33332f;
+  }
+
+  body { background:var(--plane); color:var(--ink); font-family:var(--sans); }
+  * { box-sizing:border-box; }
+  @media (prefers-reduced-motion: reduce) { * { transition:none !important; } }
+
+  .wrap { max-width:1080px; margin:0 auto; padding:40px 24px 72px; display:flex; flex-direction:column; gap:28px; }
+  .eyebrow { font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+  header h1 { font-size:clamp(27px,4.2vw,38px); font-weight:600; letter-spacing:-.02em; margin:10px 0 10px; text-wrap:balance; }
+  header p { margin:0; color:var(--ink-2); font-size:15.5px; line-height:1.62; max-width:66ch; }
+  header p + p { margin-top:11px; }
+
+  .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(168px,1fr)); gap:1px; background:var(--hair);
+           border:1px solid var(--hair); border-radius:3px; overflow:hidden; }
+  .stat { background:var(--surface); padding:16px 18px; display:flex; flex-direction:column; gap:5px; }
+  .stat .k { font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+  .stat .v { font-size:26px; font-weight:600; letter-spacing:-.02em; line-height:1.05; }
+  .stat .s { font-size:12px; color:var(--ink-2); }
+  .stat .s i { font-style:normal; color:var(--muted); }
+
+  .card { background:var(--surface); border:1px solid var(--hair); border-radius:3px; padding:18px 20px 16px; }
+  .card > header { margin-bottom:4px; }
+  .card h2 { font-size:15px; font-weight:600; margin:0; letter-spacing:-.01em; }
+  .card .sub { font-size:12.5px; color:var(--ink-2); margin:3px 0 0; max-width:80ch; line-height:1.55; }
+
+  .legend { display:flex; gap:18px; align-items:center; flex-wrap:wrap; margin:12px 0 2px; font-size:12.5px; color:var(--ink-2); }
+  .legend span { display:inline-flex; align-items:center; gap:7px; }
+  .key { width:14px; height:3px; border-radius:2px; flex:none; }
+  .kbox { width:11px; height:11px; border-radius:2px; flex:none; }
+
+  .plot { position:relative; width:100%; }
+  .plot svg { display:block; width:100%; height:auto; overflow:visible; }
+  .grid { stroke:var(--grid); stroke-width:1; }
+  .axis { stroke:var(--axis); stroke-width:1; }
+  .tick { font-family:var(--mono); font-size:10.5px; fill:var(--muted); font-variant-numeric:tabular-nums; }
+  .atitle { font-family:var(--sans); font-size:11.5px; fill:var(--muted); }
+  .dlabel { font-family:var(--mono); font-size:11.5px; font-weight:500; font-variant-numeric:tabular-nums; }
+  .anno { font-family:var(--mono); font-size:10.5px; }
+
+  .tip { position:absolute; pointer-events:none; opacity:0; transform:translate(-50%,0);
+         background:var(--surface); border:1px solid var(--hair); border-radius:3px; padding:9px 11px;
+         box-shadow:0 6px 20px rgba(0,0,0,.14); font-family:var(--mono); font-size:11.5px; white-space:nowrap;
+         color:var(--ink); z-index:5; font-variant-numeric:tabular-nums; }
+  .tip .r { display:flex; align-items:center; gap:7px; }
+  .tip .r + .r { margin-top:3px; }
+  .tip .hd { color:var(--muted); margin-bottom:6px; letter-spacing:.04em; }
+  .tip .dot { width:7px; height:7px; border-radius:50%; flex:none; }
+  .tip b { font-weight:500; margin-left:auto; }
+
+  table { width:100%; border-collapse:collapse; font-family:var(--mono); font-size:12.5px;
+          font-variant-numeric:tabular-nums; margin-top:14px; }
+  th, td { padding:7px 10px; border-bottom:1px solid var(--hair); text-align:right; white-space:nowrap; }
+  th { color:var(--muted); font-weight:500; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; }
+  td:first-child, th:first-child { text-align:left; }
+
+  .seqbox { font-family:var(--mono); font-size:11.5px; line-height:1.7; overflow-x:auto;
+            background:var(--plane); border:1px solid var(--hair); border-radius:3px; padding:12px 14px; margin-top:12px; }
+  .seqbox div { white-space:pre; }
+  .seqbox .lab { color:var(--muted); }
+  .chg { color:var(--humanized); font-weight:600; }
+  .chg-mac { color:var(--chimeric); font-weight:600; }
+
+  footer { font-size:12.5px; color:var(--muted); line-height:1.65; border-top:1px solid var(--hair); padding-top:16px; max-width:78ch; }
+  footer code, .sub code, header code { font-family:var(--mono); font-size:11.5px; color:var(--ink-2); }
+  .note { border-left:2px solid var(--human); padding:2px 0 2px 14px; margin:0 0 14px; }
+  .warn { border-left:2px solid var(--humanized); padding:2px 0 2px 14px; margin:14px 0 0; }
+</style>
+
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">190 approved antibodies &middot; 1994–2025</div>
+    <h1>Antibodies got human. Animal models didn't.</h1>
+    <p>Therapeutic antibodies have marched steadily away from mouse sequence: murine, then chimeric, then humanized, then fully human. In the last six years alone <b>34 fully human</b> antibodies were approved worldwide, more than the entire field produced in its first two decades.</p>
+    <p>That progress creates a testing problem. A fully human antibody dosed into an immunocompetent mouse or macaque is foreign protein, and the animal raises anti-drug antibodies against its framework. The species-conditioned framework models built in this project convert a human framework to a mouse or macaque one while leaving the CDRs untouched, producing a species-matched surrogate for in vivo work.</p>
+  </header>
+
+  <section class="stats">
+    <div class="stat"><span class="k">Fully human</span><span class="v">67</span><span class="s"><i>of 190 approved</i></span></div>
+    <div class="stat"><span class="k">Approved 2020–25</span><span class="v">98</span><span class="s">34 <i>of them human</i></span></div>
+    <div class="stat"><span class="k">Still murine</span><span class="v">5</span><span class="s"><i>last one in</i> 2019</span></div>
+    <div class="stat"><span class="k">First human mAb</span><span class="v">2002</span><span class="s"><i>adalimumab (Humira)</i></span></div>
+  </section>
+
+  <section class="card">
+    <header>
+      <h2>Cumulative worldwide approvals by antibody generation technology</h2>
+      <p class="sub">Each line is the running total of approvals for one technology. Chimeric antibodies led the 1990s, humanized took over through the 2000s and remain the largest class, and fully human, which did not exist in the clinic before 2002, has been the fastest-growing class since. Murine has been effectively abandoned: five approvals in thirty years, all for specialised formats.</p>
+    </header>
+    <div class="legend">
+      <span><i class="key" style="background:var(--murine)"></i> Murine</span>
+      <span><i class="key" style="background:var(--chimeric)"></i> Chimeric</span>
+      <span><i class="key" style="background:var(--humanized)"></i> Humanized</span>
+      <span><i class="key" style="background:var(--human)"></i> Fully human</span>
+    </div>
+    <div class="plot" id="p-cum"><div class="tip" id="t-cum"></div></div>
+  </section>
+
+  <section class="card">
+    <header>
+      <h2>Share of approvals in each era</h2>
+      <p class="sub">The same data as proportions. Mouse-derived sequence (murine plus chimeric) accounted for two thirds of approvals before 2000 and about one in nine since 2020.</p>
+    </header>
+    <div class="legend">
+      <span><i class="kbox" style="background:var(--murine)"></i> Murine</span>
+      <span><i class="kbox" style="background:var(--chimeric)"></i> Chimeric</span>
+      <span><i class="kbox" style="background:var(--humanized)"></i> Humanized</span>
+      <span><i class="kbox" style="background:var(--human)"></i> Fully human</span>
+    </div>
+    <div class="plot" id="p-era"></div>
+  </section>
+
+  <section class="card">
+    <header>
+      <h2>The worked example is the first one</h2>
+      <p class="sub">Adalimumab is the earliest fully human antibody in this dataset, approved 2002 and still among the best-selling drugs ever made. Running its VH through the two framework models gives a mouse and a macaque surrogate. CDRs are preserved verbatim; only framework residues change.</p>
+    </header>
+    <div class="seqbox" id="seqbox"></div>
+    <table>
+      <thead><tr><th>Conversion</th><th>Substitutions</th><th>Identity to human</th><th>&Delta; logP target</th><th>&Delta; logP other species</th></tr></thead>
+      <tbody>
+        <tr><td>Human → mouse</td><td>20 / 91</td><td>89.3%</td><td>+0.164</td><td>−0.402</td></tr>
+        <tr><td>Human → macaque</td><td>6 / 91</td><td>95.0%</td><td>+0.303</td><td>−0.011</td></tr>
+      </tbody>
+    </table>
+    <p class="sub" style="margin-top:12px">Six substitutions reach macaque against twenty to reach mouse: the models place a human framework closer to the primate without ever having been shown a human sequence or told anything about phylogeny.</p>
+  </section>
+
+  <section class="card">
+    <header>
+      <h2>Cumulative totals</h2>
+      <p class="sub">Every fifth year, plus the final count.</p>
+    </header>
+    <table>
+      <thead><tr><th>Year</th><th>Murine</th><th>Chimeric</th><th>Humanized</th><th>Fully human</th><th>Total</th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </section>
+
+  <footer>
+    <p class="warn"><b>What the tool does and does not fix.</b> Converting the framework addresses immunogenicity against the framework, the anti-drug antibody response that limits repeat dosing of a human mAb in an immunocompetent animal. It does <i>not</i> confer binding to a rodent ortholog of the target: the CDRs are deliberately unchanged, so specificity is unchanged. Where a human antibody simply does not recognise the mouse antigen, a framework-converted surrogate will not either, and a true surrogate with different CDRs is still required. Macaque targets are usually close enough to human that cross-reactivity holds, which is why macaque conversion is the more directly useful of the two.</p>
+    <p class="note">Source: TABS (The Antibody Society) therapeutic antibody database, exported 2026-08-18. Of 194 records marked approved, 190 are charted: three have an unspecified sequence source (tebentafusp, tarlatamab, iparomlimab/tuvonralimab) and one human antibody lacks an approval year (teprotumumab N01). Four bispecifics combine two technologies; each is assigned to its <i>less</i> human component, so the human counts here are conservative rather than inflated. Year is first approval in any jurisdiction, so the series is worldwide rather than FDA-only, and it ends at 2025, because the export lists no 2026 approvals.</p>
+    <p style="margin-bottom:0">Conversion figures from <code>convert_framework.py</code> at <code>--min-confidence 0.5</code>, using the V-gene-held-out mouse and macaque models.</p>
+  </footer>
+</div>
+
+<script id="ap-data" type="application/json">{"years": [1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025], "cum": {"Murine": [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5], "Chimeric": [1, 1, 1, 2, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 7, 8, 9, 9, 9, 9, 13, 13, 17, 18, 19, 20], "Humanized": [0, 0, 0, 0, 2, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 12, 12, 12, 14, 17, 19, 22, 25, 29, 36, 45, 53, 60, 70, 82, 97, 98], "Human": [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 6, 8, 10, 11, 11, 14, 18, 21, 26, 32, 33, 37, 49, 54, 59, 65, 67]}, "per": {"Murine": [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0], "Chimeric": [1, 0, 0, 1, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0, 0, 4, 0, 4, 1, 1, 1], "Humanized": [0, 0, 0, 0, 2, 0, 1, 1, 1, 1, 2, 1, 1, 1, 1, 0, 0, 0, 2, 3, 2, 3, 3, 4, 7, 9, 8, 7, 10, 12, 15, 1], "Human": [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4, 2, 2, 1, 0, 3, 4, 3, 5, 6, 1, 4, 12, 5, 5, 6, 2]}, "tech": ["Murine", "Chimeric", "Humanized", "Human"], "eras": [{"label": "1994\u201399", "total": 6, "counts": {"Murine": 0, "Chimeric": 4, "Humanized": 2, "Human": 0}}, {"label": "2000\u201304", "total": 9, "counts": {"Murine": 1, "Chimeric": 1, "Humanized": 6, "Human": 1}}, {"label": "2005\u201309", "total": 10, "counts": {"Murine": 1, "Chimeric": 0, "Humanized": 4, "Human": 5}}, {"label": "2010\u201314", "total": 19, "counts": {"Murine": 2, "Chimeric": 2, "Humanized": 7, "Human": 8}}, {"label": "2015\u201319", "total": 48, "counts": {"Murine": 1, "Chimeric": 2, "Humanized": 26, "Human": 19}}, {"label": "2020\u201325", "total": 98, "counts": {"Murine": 0, "Chimeric": 11, "Humanized": 53, "Human": 34}}], "total": 190, "excluded": 3, "noyear": 1, "totals": {"Murine": 5, "Chimeric": 20, "Humanized": 98, "Human": 67}}</script>
+<script>
+(function () {
+  const D = JSON.parse(document.getElementById('ap-data').textContent);
+  const CV = { Murine: '--murine', Chimeric: '--chimeric', Humanized: '--humanized', Human: '--human' };
+  const NAME = { Murine: 'Murine', Chimeric: 'Chimeric', Humanized: 'Humanized', Human: 'Fully human' };
+
+  function svg(host, W, H, inner, aria) {
+    const el = document.getElementById(host);
+    el.querySelectorAll('svg').forEach(n => n.remove());
+    const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    s.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    s.setAttribute('width', W); s.setAttribute('height', H);
+    s.setAttribute('role', 'img'); s.setAttribute('aria-label', aria);
+    s.innerHTML = inner;
+    el.appendChild(s);
+  }
+
+  let cumGeom = null;
+  function drawCum() {
+    const host = document.getElementById('p-cum');
+    const W = Math.max(320, host.clientWidth), H = 420;
+    const m = { t: 24, r: 104, b: 46, l: 46 };
+    const iw = W - m.l - m.r, ih = H - m.t - m.b;
+    const Y = D.years, ymax = 100;
+    const xs = y => m.l + (y - Y[0]) / (Y[Y.length - 1] - Y[0]) * iw;
+    const ys = v => m.t + ih - v / ymax * ih;
+    let s = '';
+    [0, 25, 50, 75, 100].forEach(t => {
+      s += `<line class="grid" x1="${m.l}" y1="${ys(t).toFixed(1)}" x2="${W - m.r}" y2="${ys(t).toFixed(1)}"/>`;
+      s += `<text class="tick" x="${m.l - 8}" y="${(ys(t) + 3.5).toFixed(1)}" text-anchor="end">${t}</text>`;
+    });
+    [1995, 2000, 2005, 2010, 2015, 2020, 2025].forEach(y => {
+      s += `<text class="tick" x="${xs(y).toFixed(1)}" y="${H - m.b + 18}" text-anchor="middle">${y}</text>`;
+    });
+    // 2002 marker: first fully human approval
+    const mx = xs(2002);
+    s += `<line x1="${mx.toFixed(1)}" y1="${m.t + 6}" x2="${mx.toFixed(1)}" y2="${(m.t + ih).toFixed(1)}" style="stroke:var(--human)" stroke-width="1" opacity="0.4"/>`;
+    s += `<text class="anno" x="${(mx + 6).toFixed(1)}" y="${m.t + 15}" text-anchor="start" style="fill:var(--human)">2002 · adalimumab, first fully human</text>`;
+
+    D.tech.forEach(t => {
+      const pts = D.cum[t];
+      const d = pts.map((v, i) => (i ? 'L' : 'M') + xs(Y[i]).toFixed(1) + ' ' + ys(v).toFixed(1)).join(' ');
+      s += `<path d="${d}" fill="none" style="stroke:var(${CV[t]})" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>`;
+      const last = pts[pts.length - 1];
+      s += `<circle cx="${xs(Y[Y.length - 1]).toFixed(1)}" cy="${ys(last).toFixed(1)}" r="4" style="fill:var(${CV[t]});stroke:var(--surface)" stroke-width="2"/>`;
+      s += `<text class="dlabel" x="${(xs(Y[Y.length - 1]) + 10).toFixed(1)}" y="${(ys(last) + 4).toFixed(1)}" text-anchor="start" style="fill:var(${CV[t]})">${last} ${NAME[t] === 'Fully human' ? 'human' : NAME[t].toLowerCase()}</text>`;
+    });
+    s += `<line class="axis" x1="${m.l}" y1="${m.t + ih}" x2="${W - m.r}" y2="${(m.t + ih).toFixed(1)}"/>`;
+    s += `<text class="atitle" x="${m.l}" y="${H - 4}">year of first approval (any jurisdiction)</text>`;
+    s += `<text class="atitle" x="${m.l - 8}" y="${m.t - 7}" text-anchor="end">cumulative approvals</text>`;
+    s += `<g id="cum-cross" style="display:none"><line class="axis" y1="${m.t}" y2="${(m.t + ih).toFixed(1)}"/>` +
+      D.tech.map(t => `<circle r="4.5" style="fill:var(${CV[t]});stroke:var(--surface)" stroke-width="2"/>`).join('') + `</g>`;
+    svg('p-cum', W, H, s, 'Cumulative worldwide antibody approvals by technology, 1994 to 2025. Humanized reaches 98, fully human 67, chimeric 20, murine 5.');
+    cumGeom = { W, H, m, iw, ih, xs, ys, Y };
+  }
+
+  (function cumHover() {
+    const host = document.getElementById('p-cum'), tip = document.getElementById('t-cum');
+    host.addEventListener('mousemove', ev => {
+      if (!cumGeom) return;
+      const g = cumGeom, r = host.getBoundingClientRect();
+      const px = (ev.clientX - r.left) / r.width * g.W;
+      const cross = document.getElementById('cum-cross');
+      if (px < g.m.l - 4 || px > g.W - g.m.r + 4) { tip.style.opacity = '0'; if (cross) cross.style.display = 'none'; return; }
+      const yr = Math.round(g.Y[0] + (px - g.m.l) / g.iw * (g.Y[g.Y.length - 1] - g.Y[0]));
+      const i = Math.max(0, Math.min(g.Y.length - 1, g.Y.indexOf(yr)));
+      cross.style.display = '';
+      const line = cross.querySelector('line'), circles = cross.querySelectorAll('circle');
+      line.setAttribute('x1', g.xs(g.Y[i])); line.setAttribute('x2', g.xs(g.Y[i]));
+      let rows = '', total = 0;
+      D.tech.forEach((t, k) => {
+        const v = D.cum[t][i]; total += v;
+        circles[k].setAttribute('cx', g.xs(g.Y[i])); circles[k].setAttribute('cy', g.ys(v));
+        rows += `<div class="r"><i class="dot" style="background:var(${CV[t]})"></i>${NAME[t]} <b>${v}</b></div>`;
+      });
+      tip.innerHTML = `<div class="hd">${g.Y[i]} &middot; ${total} approved to date</div>` + rows;
+      tip.style.opacity = '1';
+      tip.style.left = Math.max(9, Math.min(78, g.xs(g.Y[i]) / g.W * 100)) + '%';
+      tip.style.top = (g.m.t + 30) + 'px';
+    });
+    host.addEventListener('mouseleave', () => {
+      tip.style.opacity = '0';
+      const c = document.getElementById('cum-cross'); if (c) c.style.display = 'none';
+    });
+  })();
+
+  function drawEra() {
+    const host = document.getElementById('p-era');
+    const W = Math.max(320, host.clientWidth), H = 260;
+    const m = { t: 18, r: 14, b: 52, l: 40 };
+    const iw = W - m.l - m.r, ih = H - m.t - m.b;
+    const n = D.eras.length, bw = iw / n, bar = Math.min(78, bw * 0.62);
+    let s = '';
+    [0, 25, 50, 75, 100].forEach(t => {
+      const y = m.t + ih - t / 100 * ih;
+      s += `<line class="grid" x1="${m.l}" y1="${y.toFixed(1)}" x2="${W - m.r}" y2="${y.toFixed(1)}"/>`;
+      s += `<text class="tick" x="${m.l - 7}" y="${(y + 3.5).toFixed(1)}" text-anchor="end">${t}</text>`;
+    });
+    D.eras.forEach((e, i) => {
+      const cx = m.l + bw * (i + 0.5), x = cx - bar / 2;
+      let acc = 0;
+      D.tech.forEach(t => {
+        const frac = e.total ? e.counts[t] / e.total : 0;
+        if (frac <= 0) return;
+        const h = frac * ih, y = m.t + ih - (acc + frac) * ih;
+        s += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bar.toFixed(1)}" height="${Math.max(0, h - 2).toFixed(1)}" rx="2" style="fill:var(${CV[t]})"/>`;
+        if (frac > 0.13) {
+          // theme ink, not surface: near-white fails contrast on the lighter fills
+          s += `<text class="dlabel" x="${cx.toFixed(1)}" y="${(y + h / 2 + 4).toFixed(1)}" text-anchor="middle" style="fill:var(--ink)">${Math.round(frac * 100)}</text>`;
+        }
+        acc += frac;
+      });
+      s += `<text class="tick" x="${cx.toFixed(1)}" y="${H - m.b + 17}" text-anchor="middle">${e.label}</text>`;
+      s += `<text class="tick" x="${cx.toFixed(1)}" y="${H - m.b + 31}" text-anchor="middle" style="opacity:.75">n=${e.total}</text>`;
+    });
+    s += `<line class="axis" x1="${m.l}" y1="${m.t + ih}" x2="${W - m.r}" y2="${(m.t + ih).toFixed(1)}"/>`;
+    s += `<text class="atitle" x="${m.l - 7}" y="${m.t - 6}" text-anchor="end">% of era</text>`;
+    svg('p-era', W, H, s, 'Share of approvals by technology in each era; mouse-derived sequence falls from two thirds before 2000 to about a ninth after 2020.');
+  }
+
+  // adalimumab alignment
+  const SEQ = {
+    human: "EVQLVESGGGLVQPGRSLRLSCAASGFTFDDYAMHWVRQAPGKGLEWVSAITWNSGHIDYADSVEGRFTISRDNAKNSLYLQMNSLRAEDTAVYYCAKVSYLSTASSLDYWGQGTLVTVSS",
+    mouse: "EVQLVESGGGLVKPGGSLKLSCAASGFTFDDYAMHWVRQAPEKGLEWVAAITWNSGHIEYADSVKGRFTISRDNSQNTLYLQMSSLRSEDTAIYYCAKVSYLSTASSLDYWGQGTLVTVSS",
+    macaque: "EVQLVESGGGLVQPGGSLRLSCAASGFTFDDYAMQWVRQAPGKGLEWVSAITWNSGHIYYADSVKGRFTISRDNAKNSLSLQMNSLRAEDTAVYYCAKVSYLSTASSLDYWGQGVLVTVSS",
+  };
+  (function alignment() {
+    const box = document.getElementById('seqbox');
+    const mark = (seq, cls) => [...seq].map((c, i) => c === SEQ.human[i] ? c : `<span class="${cls}">${c}</span>`).join('');
+    box.innerHTML =
+      `<div><span class="lab">human      </span>${SEQ.human}</div>` +
+      `<div><span class="lab">→ mouse    </span>${mark(SEQ.mouse, 'chg')}</div>` +
+      `<div><span class="lab">→ macaque  </span>${mark(SEQ.macaque, 'chg-mac')}</div>`;
+  })();
+
+  const tb = document.getElementById('tbody');
+  const rows = [];
+  D.years.forEach((y, i) => {
+    if (y % 5 === 0 || i === D.years.length - 1) {
+      const c = D.tech.map(t => D.cum[t][i]);
+      rows.push(`<tr><td>${y}</td>${c.map(v => `<td>${v}</td>`).join('')}<td>${c.reduce((a, b) => a + b, 0)}</td></tr>`);
+    }
+  });
+  tb.innerHTML = rows.join('');
+
+  function drawAll() { drawCum(); drawEra(); }
+  drawAll();
+  let raf;
+  new ResizeObserver(() => { cancelAnimationFrame(raf); raf = requestAnimationFrame(drawAll); }).observe(document.body);
+})();
+</script>
+</body>
+</html>

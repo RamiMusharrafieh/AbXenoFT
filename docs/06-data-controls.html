@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#f9f9f7;color:#0b0b0b}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Macaque Run and Data Controls</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    color-scheme: light;
+    --plane:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink-2:#52514e; --muted:#898781;
+    --grid:#e1e0d9; --axis:#c3c2b7; --hair:rgba(11,11,11,0.10);
+    --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --wash:rgba(42,120,214,0.07); --meter:#d8d7d0;
+    --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --plane:#0d0d0d; --surface:#1a1a19; --ink:#ffffff; --ink-2:#c3c2b7; --muted:#898781;
+      --grid:#2c2c2a; --axis:#383835; --hair:rgba(255,255,255,0.10);
+      --s1:#3987e5; --s2:#d95926; --s3:#199e70; --wash:rgba(57,135,229,0.10); --meter:#33332f;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --plane:#0d0d0d; --surface:#1a1a19; --ink:#ffffff; --ink-2:#c3c2b7; --muted:#898781;
+    --grid:#2c2c2a; --axis:#383835; --hair:rgba(255,255,255,0.10);
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --wash:rgba(57,135,229,0.10); --meter:#33332f;
+  }
+
+  body { background:var(--plane); color:var(--ink); font-family:var(--sans); }
+  * { box-sizing:border-box; }
+  @media (prefers-reduced-motion: reduce) { * { transition:none !important; } }
+
+  .wrap { max-width:1080px; margin:0 auto; padding:40px 24px 72px; display:flex; flex-direction:column; gap:28px; }
+  .eyebrow { font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+  header h1 { font-size:clamp(26px,4vw,36px); font-weight:600; letter-spacing:-.02em; margin:10px 0 8px; text-wrap:balance; }
+  header p { margin:0; color:var(--ink-2); font-size:15px; line-height:1.6; max-width:68ch; }
+  header p + p { margin-top:10px; }
+
+  .card { background:var(--surface); border:1px solid var(--hair); border-radius:3px; padding:18px 20px 16px; }
+  .card > header { display:flex; align-items:baseline; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:4px; }
+  .card h2 { font-size:15px; font-weight:600; margin:0; letter-spacing:-.01em; }
+  .card .sub { font-size:12.5px; color:var(--ink-2); margin:3px 0 0; max-width:78ch; line-height:1.55; }
+
+  .seg { display:inline-flex; border:1px solid var(--hair); border-radius:3px; overflow:hidden; }
+  .seg button { font-family:var(--mono); font-size:11px; letter-spacing:.06em; text-transform:uppercase;
+                padding:5px 11px; background:transparent; color:var(--ink-2); border:0; cursor:pointer; }
+  .seg button + button { border-left:1px solid var(--hair); }
+  .seg button[aria-pressed="true"] { background:var(--wash); color:var(--ink); font-weight:500; }
+  .seg button:focus-visible { outline:2px solid var(--s1); outline-offset:-2px; }
+
+  .legend { display:flex; gap:18px; align-items:center; flex-wrap:wrap; margin:12px 0 2px; font-size:12.5px; color:var(--ink-2); }
+  .legend span { display:inline-flex; align-items:center; gap:7px; }
+  .key { width:13px; height:3px; border-radius:2px; flex:none; }
+  .kbox { width:11px; height:11px; border-radius:2px; flex:none; }
+
+  .plot { position:relative; width:100%; }
+  .plot svg { display:block; width:100%; height:auto; overflow:visible; }
+  .grid { stroke:var(--grid); stroke-width:1; }
+  .axis { stroke:var(--axis); stroke-width:1; }
+  .tick { font-family:var(--mono); font-size:10.5px; fill:var(--muted); font-variant-numeric:tabular-nums; }
+  .atitle { font-family:var(--sans); font-size:11.5px; fill:var(--muted); }
+  .dlabel { font-family:var(--mono); font-size:11px; font-weight:500; font-variant-numeric:tabular-nums; }
+  .pielab { font-family:var(--mono); font-size:11px; font-weight:500; }
+  .piepct { font-family:var(--sans); font-size:13px; font-weight:600; }
+
+  .two { display:grid; grid-template-columns:repeat(auto-fit,minmax(330px,1fr)); gap:20px; }
+
+  .tip { position:absolute; pointer-events:none; opacity:0; transform:translate(-50%,0);
+         background:var(--surface); border:1px solid var(--hair); border-radius:3px; padding:8px 10px;
+         box-shadow:0 6px 20px rgba(0,0,0,.13); font-family:var(--mono); font-size:11.5px; white-space:nowrap;
+         color:var(--ink); z-index:5; font-variant-numeric:tabular-nums; }
+  .tip .r { display:flex; align-items:center; gap:7px; }
+  .tip .r + .r { margin-top:3px; }
+  .tip .hd { color:var(--muted); margin-bottom:5px; letter-spacing:.04em; }
+  .tip .dot { width:7px; height:7px; border-radius:50%; flex:none; }
+
+  .cmp { width:100%; border-collapse:collapse; font-family:var(--mono); font-size:12.5px;
+         font-variant-numeric:tabular-nums; margin-top:14px; }
+  .cmp th, .cmp td { padding:8px 10px; border-bottom:1px solid var(--hair); text-align:right; white-space:nowrap; }
+  .cmp th { color:var(--muted); font-weight:500; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; }
+  .cmp td:first-child, .cmp th:first-child { text-align:left; }
+  .cmp td.hi { color:var(--s2); font-weight:500; }
+  .cmp td.lo { color:var(--s1); font-weight:500; }
+
+  footer { font-size:12.5px; color:var(--muted); line-height:1.65; border-top:1px solid var(--hair); padding-top:16px; max-width:78ch; }
+  footer code, .sub code, header code { font-family:var(--mono); font-size:11.5px; color:var(--ink-2); }
+  .note { border-left:2px solid var(--s2); padding:2px 0 2px 14px; margin:0 0 14px; }
+</style>
+
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Macaque training &middot; data integrity</div>
+    <h1>Half a random validation set sits two mutations from training data</h1>
+    <p>Three controls on the framework pipeline: the macaque model's cross-entropy curve, a direct measurement of how much a random split leaks into validation, and the deduplication funnel for both species.</p>
+    <p>The leakage figure is measured rather than assumed. For a sample of validation sequences we find the Hamming distance to the nearest training sequence under each split scheme: the closer that neighbour, the less the validation score means.</p>
+  </header>
+
+  <section class="card">
+    <header>
+      <div>
+        <h2>Macaque cross-entropy</h2>
+        <p class="sub">Masked-language-model loss is cross-entropy over the 20 amino acids at masked positions. One epoch, 60,083 steps, batch 16, evaluated every 4,000 steps on 10,000 held-out-germline sequences. Falls from 2.347 at initialisation to a best of <b>0.4427</b> (perplexity 1.557) at step 60,000, with the learning-rate anneal delivering its gain in the final fifth, the same shape the mouse run showed.</p>
+      </div>
+      <div class="seg" role="group" aria-label="y-axis scale">
+        <button id="b-log" aria-pressed="true">Log</button>
+        <button id="b-lin" aria-pressed="false">Linear</button>
+      </div>
+    </header>
+    <div class="legend">
+      <span><i class="key" style="background:var(--muted)"></i> Training loss <i style="color:var(--muted);font-style:normal">(every 200 steps)</i></span>
+      <span><i class="key" style="background:var(--s2)"></i> Validation loss <i style="color:var(--muted);font-style:normal">(held-out V genes)</i></span>
+    </div>
+    <div class="plot" id="p-curve"><div class="tip" id="t-curve"></div></div>
+  </section>
+
+  <section class="card">
+    <header>
+      <div>
+        <h2>Leakage control: how close is the nearest training sequence?</h2>
+        <p class="sub">Exact duplicates cannot leak, because the data is deduplicated. What leaks is <i>near</i> duplicates: somatic-hypermutation variants of the same germline landing on opposite sides of a random split. Each curve is the distribution of Hamming distance from a validation sequence to its nearest training neighbour, over 1,500 validation sequences searched against 150,000 training sequences. A random split piles up at distance 1–2; holding out whole V genes pushes the mass right.</p>
+      </div>
+    </header>
+    <div class="legend">
+      <span><i class="key" style="background:var(--s1)"></i> Random split</span>
+      <span><i class="key" style="background:var(--s2)"></i> V genes held out</span>
+    </div>
+    <div class="two" style="margin-top:6px">
+      <div><div class="eyebrow" style="margin-bottom:6px">Mouse</div><div class="plot" id="p-leak-mouse"><div class="tip" id="t-leak-mouse"></div></div></div>
+      <div><div class="eyebrow" style="margin-bottom:6px">Macaque</div><div class="plot" id="p-leak-macaque"><div class="tip" id="t-leak-macaque"></div></div></div>
+    </div>
+    <table class="cmp">
+      <thead><tr><th>Validation sequences within…</th><th>Mouse random</th><th>Mouse V-gene</th><th>Macaque random</th><th>Macaque V-gene</th></tr></thead>
+      <tbody id="leak-tbody"></tbody>
+    </table>
+  </section>
+
+  <section class="card">
+    <header>
+      <div>
+        <h2>Deduplication funnel</h2>
+        <p class="sub">What each raw OAS download becomes. The two species could hardly differ more: mouse collapses to <b>15.4%</b> of its raw reads, macaque retains <b>82.4%</b>. Mouse loses most of its volume twice over: a third fails QC (mostly incomplete V(D)J spans), then three quarters of the survivors are exact duplicates of another sequence. Macaque loses almost nothing to either.</p>
+      </div>
+    </header>
+    <div class="legend">
+      <span><i class="kbox" style="background:var(--s1)"></i> Unique frameworks kept</span>
+      <span><i class="kbox" style="background:var(--s2)"></i> Exact duplicates removed</span>
+      <span><i class="kbox" style="background:var(--s3)"></i> Failed QC filters</span>
+    </div>
+    <div class="two" style="margin-top:6px">
+      <div><div class="plot" id="p-pie-mouse"></div></div>
+      <div><div class="plot" id="p-pie-macaque"></div></div>
+    </div>
+  </section>
+
+  <footer>
+    <p class="note"><b>Why this matters for the reported scores.</b> The mouse model scored 94.77% on a random split and 90.13% on held-out germlines. The leakage measurement explains the gap concretely: under a random split 50.7% of validation sequences sit within two mutations of a training sequence, versus 4.0% under the V-gene split. The model was largely being asked to recall sequences it had almost already seen. Macaque leaks less under a random split (31.3% within two mutations) because its unsorted-B-cell repertoire is more diverse, the same property that makes 82.4% of its reads unique.</p>
+    <p style="margin-bottom:0">Method: Hamming distance over the fixed 91-residue framework, 1,500 validation sequences against a 150,000-sequence training sample per scheme, seed 42. The V-gene scheme is the exact split each model trained under. Funnel counts come from the extraction logs: raw rows in the OAS download, rows passing the productivity/stop-codon/complete-VDJ filters, then unique concatenated frameworks. Source: <code>analysis_leakage.py</code>.</p>
+  </footer>
+</div>
+
+<script id="ctl-data" type="application/json">{"curve": {"train": [{"step": 200, "loss": 2.16}, {"step": 400, "loss": 1.39168}, {"step": 600, "loss": 0.924}, {"step": 800, "loss": 0.81359}, {"step": 1000, "loss": 0.69114}, {"step": 1200, "loss": 0.65638}, {"step": 1400, "loss": 0.60956}, {"step": 1600, "loss": 0.57468}, {"step": 1800, "loss": 0.55141}, {"step": 2000, "loss": 0.5442}, {"step": 2200, "loss": 0.51527}, {"step": 2400, "loss": 0.50063}, {"step": 2600, "loss": 0.4898}, {"step": 2800, "loss": 0.47732}, {"step": 3000, "loss": 0.47266}, {"step": 3200, "loss": 0.4617}, {"step": 3400, "loss": 0.44793}, {"step": 3600, "loss": 0.4465}, {"step": 3800, "loss": 0.44275}, {"step": 4000, "loss": 0.43645}, {"step": 4200, "loss": 0.4345}, {"step": 4400, "loss": 0.43554}, {"step": 4600, "loss": 0.42253}, {"step": 4800, "loss": 0.42558}, {"step": 5000, "loss": 0.4197}, {"step": 5200, "loss": 0.4265}, {"step": 5400, "loss": 0.41473}, {"step": 5600, "loss": 0.41286}, {"step": 5800, "loss": 0.4093}, {"step": 6000, "loss": 0.41234}, {"step": 6200, "loss": 0.3892}, {"step": 6400, "loss": 0.40285}, {"step": 6600, "loss": 0.40454}, {"step": 6800, "loss": 0.39332}, {"step": 7000, "loss": 0.40261}, {"step": 7200, "loss": 0.38173}, {"step": 7400, "loss": 0.38714}, {"step": 7600, "loss": 0.38187}, {"step": 7800, "loss": 0.39672}, {"step": 8000, "loss": 0.38614}, {"step": 8200, "loss": 0.38597}, {"step": 8400, "loss": 0.37809}, {"step": 8600, "loss": 0.3878}, {"step": 8800, "loss": 0.38944}, {"step": 9000, "loss": 0.37629}, {"step": 9200, "loss": 0.38055}, {"step": 9400, "loss": 0.38292}, {"step": 9600, "loss": 0.37476}, {"step": 9800, "loss": 0.37531}, {"step": 10000, "loss": 0.37014}, {"step": 10200, "loss": 0.37653}, {"step": 10400, "loss": 0.36545}, {"step": 10600, "loss": 0.37215}, {"step": 10800, "loss": 0.36653}, {"step": 11000, "loss": 0.37294}, {"step": 11200, "loss": 0.37761}, {"step": 11400, "loss": 0.36814}, {"step": 11600, "loss": 0.36836}, {"step": 11800, "loss": 0.374}, {"step": 12000, "loss": 0.35367}, {"step": 12200, "loss": 0.3794}, {"step": 12400, "loss": 0.36824}, {"step": 12600, "loss": 0.36155}, {"step": 12800, "loss": 0.37373}, {"step": 13000, "loss": 0.369}, {"step": 13200, "loss": 0.36894}, {"step": 13400, "loss": 0.35109}, {"step": 13600, "loss": 0.36649}, {"step": 13800, "loss": 0.35785}, {"step": 14000, "loss": 0.36389}, {"step": 14200, "loss": 0.36514}, {"step": 14400, "loss": 0.36028}, {"step": 14600, "loss": 0.35579}, {"step": 14800, "loss": 0.36751}, {"step": 15000, "loss": 0.35848}, {"step": 15200, "loss": 0.36597}, {"step": 15400, "loss": 0.35653}, {"step": 15600, "loss": 0.35122}, {"step": 15800, "loss": 0.36285}, {"step": 16000, "loss": 0.36508}, {"step": 16200, "loss": 0.35823}, {"step": 16400, "loss": 0.35345}, {"step": 16600, "loss": 0.36353}, {"step": 16800, "loss": 0.36018}, {"step": 17000, "loss": 0.3576}, {"step": 17200, "loss": 0.35997}, {"step": 17400, "loss": 0.34999}, {"step": 17600, "loss": 0.36083}, {"step": 17800, "loss": 0.35594}, {"step": 18000, "loss": 0.3612}, {"step": 18200, "loss": 0.36095}, {"step": 18400, "loss": 0.34962}, {"step": 18600, "loss": 0.3626}, {"step": 18800, "loss": 0.3552}, {"step": 19000, "loss": 0.34709}, {"step": 19200, "loss": 0.35157}, {"step": 19400, "loss": 0.35697}, {"step": 19600, "loss": 0.34751}, {"step": 19800, "loss": 0.35743}, {"step": 20000, "loss": 0.34673}, {"step": 20200, "loss": 0.35387}, {"step": 20400, "loss": 0.36051}, {"step": 20600, "loss": 0.34968}, {"step": 20800, "loss": 0.3517}, {"step": 21000, "loss": 0.35661}, {"step": 21200, "loss": 0.35298}, {"step": 21400, "loss": 0.34929}, {"step": 21600, "loss": 0.34783}, {"step": 21800, "loss": 0.35253}, {"step": 22000, "loss": 0.36482}, {"step": 22200, "loss": 0.34976}, {"step": 22400, "loss": 0.35517}, {"step": 22600, "loss": 0.35462}, {"step": 22800, "loss": 0.351}, {"step": 23000, "loss": 0.35719}, {"step": 23200, "loss": 0.34829}, {"step": 23400, "loss": 0.34508}, {"step": 23600, "loss": 0.33821}, {"step": 23800, "loss": 0.35038}, {"step": 24000, "loss": 0.34276}, {"step": 24200, "loss": 0.34179}, {"step": 24400, "loss": 0.34876}, {"step": 24600, "loss": 0.35262}, {"step": 24800, "loss": 0.34884}, {"step": 25000, "loss": 0.34936}, {"step": 25200, "loss": 0.34773}, {"step": 25400, "loss": 0.35213}, {"step": 25600, "loss": 0.35085}, {"step": 25800, "loss": 0.3448}, {"step": 26000, "loss": 0.34868}, {"step": 26200, "loss": 0.33911}, {"step": 26400, "loss": 0.35024}, {"step": 26600, "loss": 0.34434}, {"step": 26800, "loss": 0.34396}, {"step": 27000, "loss": 0.34872}, {"step": 27200, "loss": 0.33683}, {"step": 27400, "loss": 0.35102}, {"step": 27600, "loss": 0.34635}, {"step": 27800, "loss": 0.35242}, {"step": 28000, "loss": 0.35142}, {"step": 28200, "loss": 0.33499}, {"step": 28400, "loss": 0.34861}, {"step": 28600, "loss": 0.34926}, {"step": 28800, "loss": 0.34347}, {"step": 29000, "loss": 0.33774}, {"step": 29200, "loss": 0.34581}, {"step": 29400, "loss": 0.34319}, {"step": 29600, "loss": 0.34284}, {"step": 29800, "loss": 0.34556}, {"step": 30000, "loss": 0.34067}, {"step": 30200, "loss": 0.337}, {"step": 30400, "loss": 0.33854}, {"step": 30600, "loss": 0.34663}, {"step": 30800, "loss": 0.34158}, {"step": 31000, "loss": 0.34333}, {"step": 31200, "loss": 0.33928}, {"step": 31400, "loss": 0.33726}, {"step": 31600, "loss": 0.33914}, {"step": 31800, "loss": 0.34185}, {"step": 32000, "loss": 0.34616}, {"step": 32200, "loss": 0.34258}, {"step": 32400, "loss": 0.3405}, {"step": 32600, "loss": 0.33901}, {"step": 32800, "loss": 0.34203}, {"step": 33000, "loss": 0.33672}, {"step": 33200, "loss": 0.34153}, {"step": 33400, "loss": 0.33475}, {"step": 33600, "loss": 0.33873}, {"step": 33800, "loss": 0.33902}, {"step": 34000, "loss": 0.33329}, {"step": 34200, "loss": 0.33134}, {"step": 34400, "loss": 0.33639}, {"step": 34600, "loss": 0.33581}, {"step": 34800, "loss": 0.33279}, {"step": 35000, "loss": 0.33456}, {"step": 35200, "loss": 0.33745}, {"step": 35400, "loss": 0.33801}, {"step": 35600, "loss": 0.33024}, {"step": 35800, "loss": 0.35228}, {"step": 36000, "loss": 0.33127}, {"step": 36200, "loss": 0.33856}, {"step": 36400, "loss": 0.34258}, {"step": 36600, "loss": 0.34104}, {"step": 36800, "loss": 0.32283}, {"step": 37000, "loss": 0.33368}, {"step": 37200, "loss": 0.33816}, {"step": 37400, "loss": 0.33815}, {"step": 37600, "loss": 0.34072}, {"step": 37800, "loss": 0.34209}, {"step": 38000, "loss": 0.33888}, {"step": 38200, "loss": 0.33309}, {"step": 38400, "loss": 0.33044}, {"step": 38600, "loss": 0.34665}, {"step": 38800, "loss": 0.34111}, {"step": 39000, "loss": 0.33732}, {"step": 39200, "loss": 0.33392}, {"step": 39400, "loss": 0.34359}, {"step": 39600, "loss": 0.32924}, {"step": 39800, "loss": 0.33901}, {"step": 40000, "loss": 0.32958}, {"step": 40200, "loss": 0.33837}, {"step": 40400, "loss": 0.33539}, {"step": 40600, "loss": 0.33584}, {"step": 40800, "loss": 0.33123}, {"step": 41000, "loss": 0.33974}, {"step": 41200, "loss": 0.34193}, {"step": 41400, "loss": 0.33358}, {"step": 41600, "loss": 0.34403}, {"step": 41800, "loss": 0.32241}, {"step": 42000, "loss": 0.33234}, {"step": 42200, "loss": 0.33189}, {"step": 42400, "loss": 0.33543}, {"step": 42600, "loss": 0.33206}, {"step": 42800, "loss": 0.3304}, {"step": 43000, "loss": 0.33086}, {"step": 43200, "loss": 0.34193}, {"step": 43400, "loss": 0.33492}, {"step": 43600, "loss": 0.33708}, {"step": 43800, "loss": 0.33763}, {"step": 44000, "loss": 0.33036}, {"step": 44200, "loss": 0.31686}, {"step": 44400, "loss": 0.32085}, {"step": 44600, "loss": 0.33536}, {"step": 44800, "loss": 0.32988}, {"step": 45000, "loss": 0.33751}, {"step": 45200, "loss": 0.33335}, {"step": 45400, "loss": 0.34146}, {"step": 45600, "loss": 0.33697}, {"step": 45800, "loss": 0.31458}, {"step": 46000, "loss": 0.32489}, {"step": 46200, "loss": 0.34147}, {"step": 46400, "loss": 0.32219}, {"step": 46600, "loss": 0.33689}, {"step": 46800, "loss": 0.32657}, {"step": 47000, "loss": 0.33494}, {"step": 47200, "loss": 0.33188}, {"step": 47400, "loss": 0.33366}, {"step": 47600, "loss": 0.32314}, {"step": 47800, "loss": 0.32353}, {"step": 48000, "loss": 0.33921}, {"step": 48200, "loss": 0.33197}, {"step": 48400, "loss": 0.32706}, {"step": 48600, "loss": 0.32705}, {"step": 48800, "loss": 0.33743}, {"step": 49000, "loss": 0.33171}, {"step": 49200, "loss": 0.32353}, {"step": 49400, "loss": 0.33448}, {"step": 49600, "loss": 0.3293}, {"step": 49800, "loss": 0.32521}, {"step": 50000, "loss": 0.33278}, {"step": 50200, "loss": 0.32788}, {"step": 50400, "loss": 0.33414}, {"step": 50600, "loss": 0.32355}, {"step": 50800, "loss": 0.3287}, {"step": 51000, "loss": 0.31741}, {"step": 51200, "loss": 0.32433}, {"step": 51400, "loss": 0.33702}, {"step": 51600, "loss": 0.32669}, {"step": 51800, "loss": 0.32469}, {"step": 52000, "loss": 0.32979}, {"step": 52200, "loss": 0.32716}, {"step": 52400, "loss": 0.33309}, {"step": 52600, "loss": 0.32699}, {"step": 52800, "loss": 0.32806}, {"step": 53000, "loss": 0.32932}, {"step": 53200, "loss": 0.33165}, {"step": 53400, "loss": 0.3294}, {"step": 53600, "loss": 0.32438}, {"step": 53800, "loss": 0.33696}, {"step": 54000, "loss": 0.33309}, {"step": 54200, "loss": 0.32675}, {"step": 54400, "loss": 0.33691}, {"step": 54600, "loss": 0.33511}, {"step": 54800, "loss": 0.32049}, {"step": 55000, "loss": 0.33101}, {"step": 55200, "loss": 0.32656}, {"step": 55400, "loss": 0.32823}, {"step": 55600, "loss": 0.31855}, {"step": 55800, "loss": 0.32318}, {"step": 56000, "loss": 0.32662}, {"step": 56200, "loss": 0.34148}, {"step": 56400, "loss": 0.3296}, {"step": 56600, "loss": 0.32543}, {"step": 56800, "loss": 0.32812}, {"step": 57000, "loss": 0.31846}, {"step": 57200, "loss": 0.33069}, {"step": 57400, "loss": 0.3315}, {"step": 57600, "loss": 0.33049}, {"step": 57800, "loss": 0.32778}, {"step": 58000, "loss": 0.32005}, {"step": 58200, "loss": 0.32394}, {"step": 58400, "loss": 0.32671}, {"step": 58600, "loss": 0.32953}, {"step": 58800, "loss": 0.32508}, {"step": 59000, "loss": 0.32403}, {"step": 59200, "loss": 0.33148}, {"step": 59400, "loss": 0.32351}, {"step": 59600, "loss": 0.32627}, {"step": 59800, "loss": 0.33096}, {"step": 60000, "loss": 0.32167}], "eval": [{"step": 4000, "loss": 0.52304}, {"step": 8000, "loss": 0.4895}, {"step": 12000, "loss": 0.47932}, {"step": 16000, "loss": 0.46501}, {"step": 20000, "loss": 0.46589}, {"step": 24000, "loss": 0.45895}, {"step": 28000, "loss": 0.45222}, {"step": 32000, "loss": 0.45934}, {"step": 36000, "loss": 0.45537}, {"step": 40000, "loss": 0.45663}, {"step": 44000, "loss": 0.45587}, {"step": 48000, "loss": 0.45257}, {"step": 52000, "loss": 0.44673}, {"step": 56000, "loss": 0.44302}, {"step": 60000, "loss": 0.44274}, {"step": 60083, "loss": 0.44343}], "best": 0.4427396059036255, "baseline": 2.3472, "total_steps": 60083}, "leakage": {"mouse": {"random": {"hist": [0, 185, 575, 329, 162, 105, 50, 45, 24, 10, 6, 4, 2, 2, 1, 0, 0, 0, 0, 0, 0, 0], "median": 2.0, "mean": 3.04, "le1": 0.12333333333333334, "le2": 0.5066666666666667, "le5": 0.904}, "v_gene": {"hist": [0, 7, 53, 209, 351, 319, 189, 110, 70, 31, 20, 13, 11, 14, 29, 25, 18, 21, 4, 2, 2, 2], "median": 5.0, "mean": 5.838666666666667, "le1": 0.004666666666666667, "le2": 0.04, "le5": 0.626}}, "macaque": {"random": {"hist": [0, 126, 343, 313, 235, 154, 107, 76, 45, 28, 27, 16, 11, 8, 5, 1, 2, 2, 0, 0, 0, 1], "median": 3.0, "mean": 4.072666666666667, "le1": 0.084, "le2": 0.31266666666666665, "le5": 0.7806666666666666}, "v_gene": {"hist": [0, 26, 114, 157, 171, 170, 153, 126, 112, 122, 82, 83, 48, 38, 34, 24, 9, 9, 15, 5, 1, 1], "median": 6.0, "mean": 6.93, "le1": 0.017333333333333333, "le2": 0.09333333333333334, "le5": 0.42533333333333334}}}, "funnel": {"mouse": {"raw": 17933653, "qc": 11688651, "unique": 2767822}, "macaque": {"raw": 1467486, "qc": 1419444, "unique": 1209734}}, "n_val": 1500, "n_train": 150000}</script>
+<script>
+(function () {
+  const D = JSON.parse(document.getElementById('ctl-data').textContent);
+  const fmt = n => n.toLocaleString();
+
+  function svg(host, W, H, inner, aria) {
+    const el = document.getElementById(host);
+    el.querySelectorAll('svg').forEach(n => n.remove());
+    const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    s.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    s.setAttribute('width', W); s.setAttribute('height', H);
+    s.setAttribute('role', 'img'); s.setAttribute('aria-label', aria);
+    s.innerHTML = inner;
+    el.appendChild(s);
+  }
+
+  // ---------- macaque cross-entropy ----------
+  const TOTAL = D.curve.total_steps;
+  const trainPts = D.curve.train.map(d => ({ x: d.step, y: d.loss }));
+  const evalPts = [{ x: 0, y: D.curve.baseline }].concat(D.curve.eval.map(d => ({ x: d.step, y: d.loss })));
+  let curveLog = true;
+
+  function drawCurve() {
+    const host = document.getElementById('p-curve');
+    const W = Math.max(320, host.clientWidth), H = 380;
+    const m = { t: 24, r: 74, b: 44, l: 56 };
+    const iw = W - m.l - m.r, ih = H - m.t - m.b;
+    const yd = curveLog ? [0.38, 2.7] : [0, 2.5];
+    const ticks = curveLog ? [0.4, 0.6, 1, 2] : [0, 0.5, 1, 1.5, 2, 2.5];
+    const xs = v => m.l + v / TOTAL * iw;
+    const ys = curveLog
+      ? v => { const a = Math.log10(yd[0]), b = Math.log10(yd[1]);
+               return m.t + ih - (Math.log10(v) - a) / (b - a) * ih; }
+      : v => m.t + ih - (v - yd[0]) / (yd[1] - yd[0]) * ih;
+    let s = '';
+    ticks.forEach(t => {
+      s += `<line class="grid" x1="${m.l}" y1="${ys(t).toFixed(1)}" x2="${W - m.r}" y2="${ys(t).toFixed(1)}"/>`;
+      s += `<text class="tick" x="${m.l - 8}" y="${(ys(t) + 3.5).toFixed(1)}" text-anchor="end">${t}</text>`;
+    });
+    [0, 15000, 30000, 45000, 60000].forEach(t => {
+      s += `<text class="tick" x="${xs(t).toFixed(1)}" y="${H - m.b + 17}" text-anchor="middle">${t === 0 ? '0' : (t / 1000) + 'k'}</text>`;
+    });
+    const path = pts => pts.map((p, i) => (i ? 'L' : 'M') + xs(p.x).toFixed(1) + ' ' + ys(Math.max(p.y, yd[0])).toFixed(1)).join(' ');
+    s += `<path d="${path(trainPts)}" fill="none" style="stroke:var(--muted)" stroke-width="1.3" opacity="0.6" stroke-linejoin="round"/>`;
+    s += `<path d="${path(evalPts)}" fill="none" style="stroke:var(--s2)" stroke-width="2" stroke-linejoin="round"/>`;
+    evalPts.forEach(p => {
+      s += `<circle cx="${xs(p.x).toFixed(1)}" cy="${ys(Math.max(p.y, yd[0])).toFixed(1)}" r="3.6" style="fill:var(--s2);stroke:var(--surface)" stroke-width="2"/>`;
+    });
+    const last = evalPts[evalPts.length - 1];
+    s += `<text class="dlabel" x="${(xs(last.x) + 9).toFixed(1)}" y="${(ys(last.y) + 4).toFixed(1)}" text-anchor="start" style="fill:var(--s2)">${last.y.toFixed(3)}</text>`;
+    s += `<text class="dlabel" x="${(xs(0) + 8).toFixed(1)}" y="${(ys(D.curve.baseline) - 8).toFixed(1)}" text-anchor="start" style="fill:var(--s2)">${D.curve.baseline.toFixed(2)}</text>`;
+    s += `<line class="axis" x1="${m.l}" y1="${m.t + ih}" x2="${W - m.r}" y2="${m.t + ih}"/>`;
+    s += `<text class="atitle" x="${m.l}" y="${H - 4}">training step</text>`;
+    s += `<text class="atitle" x="${m.l - 8}" y="${m.t - 6}" text-anchor="end">cross-entropy</text>`;
+    s += `<g id="curve-cross" style="display:none"><line class="axis" y1="${m.t}" y2="${m.t + ih}"/>
+          <circle r="4.5" style="fill:var(--s2);stroke:var(--surface);display:none" stroke-width="2"/>
+          <circle r="4" style="fill:var(--muted);stroke:var(--surface);display:none" stroke-width="2"/></g>`;
+    svg('p-curve', W, H, s, 'Macaque cross-entropy loss over 60,083 training steps, falling from 2.35 to 0.44.');
+    return { W, H, m, iw, xs, ys, yd };
+  }
+  let curveGeom = drawCurve();
+
+  (function curveHover() {
+    const host = document.getElementById('p-curve'), tip = document.getElementById('t-curve');
+    host.addEventListener('mousemove', ev => {
+      const g = curveGeom, r = host.getBoundingClientRect();
+      const px = (ev.clientX - r.left) / r.width * g.W;
+      if (px < g.m.l - 4 || px > g.W - g.m.r + 4) { tip.style.opacity = '0'; const c = document.getElementById('curve-cross'); if (c) c.style.display = 'none'; return; }
+      const step = (px - g.m.l) / g.iw * TOTAL;
+      const near = (arr) => arr.reduce((b, p) => Math.abs(p.x - step) < Math.abs(b.x - step) ? p : b, arr[0]);
+      const e = near(evalPts), t = near(trainPts);
+      const cross = document.getElementById('curve-cross');
+      cross.style.display = '';
+      const cl = cross.querySelector('line'), cs = cross.querySelectorAll('circle');
+      cl.setAttribute('x1', g.xs(e.x)); cl.setAttribute('x2', g.xs(e.x));
+      cs[0].setAttribute('cx', g.xs(e.x)); cs[0].setAttribute('cy', g.ys(Math.max(e.y, g.yd[0]))); cs[0].style.display = '';
+      cs[1].setAttribute('cx', g.xs(t.x)); cs[1].setAttribute('cy', g.ys(Math.max(t.y, g.yd[0]))); cs[1].style.display = '';
+      tip.innerHTML = `<div class="hd">step ${Math.round(e.x).toLocaleString()}</div>
+        <div class="r"><i class="dot" style="background:var(--s2)"></i>validation <b style="font-weight:500;margin-left:auto">${e.y.toFixed(4)}</b></div>
+        <div class="r"><i class="dot" style="background:var(--muted)"></i>training <b style="font-weight:500;margin-left:auto">${t.y.toFixed(4)}</b></div>`;
+      tip.style.opacity = '1';
+      tip.style.left = Math.max(8, Math.min(92, g.xs(e.x) / g.W * 100)) + '%';
+      tip.style.top = (g.m.t + 8) + 'px';
+    });
+    host.addEventListener('mouseleave', () => {
+      tip.style.opacity = '0';
+      const c = document.getElementById('curve-cross'); if (c) c.style.display = 'none';
+    });
+  })();
+
+  document.getElementById('b-log').addEventListener('click', () => setScale(true));
+  document.getElementById('b-lin').addEventListener('click', () => setScale(false));
+  function setScale(isLog) {
+    curveLog = isLog;
+    document.getElementById('b-log').setAttribute('aria-pressed', String(isLog));
+    document.getElementById('b-lin').setAttribute('aria-pressed', String(!isLog));
+    curveGeom = drawCurve();
+  }
+
+  // ---------- leakage distributions ----------
+  function drawLeak(hostId, sp) {
+    const host = document.getElementById(hostId);
+    const W = Math.max(300, host.clientWidth), H = 280;
+    const m = { t: 20, r: 14, b: 44, l: 44 };
+    const iw = W - m.l - m.r, ih = H - m.t - m.b;
+    const N = D.n_val, MAXD = 20;
+    const series = [['random', '--s1'], ['v_gene', '--s2']];
+    let peak = 0;
+    series.forEach(([k]) => D.leakage[sp][k].hist.forEach(v => { if (v / N > peak) peak = v / N; }));
+    const top = Math.ceil(peak * 20) / 20;
+    const xs = d => m.l + d / MAXD * iw;
+    const ys = v => m.t + ih - v / top * ih;
+    let s = '';
+    for (let t = 0; t <= top + 1e-9; t += top / 4) {
+      s += `<line class="grid" x1="${m.l}" y1="${ys(t).toFixed(1)}" x2="${W - m.r}" y2="${ys(t).toFixed(1)}"/>`;
+      s += `<text class="tick" x="${m.l - 7}" y="${(ys(t) + 3.5).toFixed(1)}" text-anchor="end">${Math.round(t * 100)}</text>`;
+    }
+    series.forEach(([k, cv]) => {
+      const h = D.leakage[sp][k].hist;
+      const pts = [];
+      for (let d = 0; d <= MAXD; d++) pts.push([xs(d), ys(h[d] / N)]);
+      s += `<path d="${pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ')}" fill="none" style="stroke:var(${cv})" stroke-width="2" stroke-linejoin="round"/>`;
+      const med = D.leakage[sp][k].median;
+      s += `<line x1="${xs(med).toFixed(1)}" y1="${m.t + ih}" x2="${xs(med).toFixed(1)}" y2="${(m.t + ih + 7)}" style="stroke:var(${cv})" stroke-width="2"/>`;
+    });
+    [0, 5, 10, 15, 20].forEach(d => {
+      s += `<text class="tick" x="${xs(d).toFixed(1)}" y="${H - m.b + 17}" text-anchor="middle">${d}${d === 20 ? '+' : ''}</text>`;
+    });
+    s += `<line class="axis" x1="${m.l}" y1="${m.t + ih}" x2="${W - m.r}" y2="${m.t + ih}"/>`;
+    s += `<text class="atitle" x="${m.l}" y="${H - 4}">mutations to nearest training sequence &rarr;</text>`;
+    s += `<text class="atitle" x="${m.l - 7}" y="${m.t - 6}" text-anchor="end">% of val</text>`;
+    svg(hostId, W, H, s, `${sp} distribution of distance to nearest training sequence, random versus V-gene split. Ticks below the axis mark each median.`);
+  }
+
+  const ROWS = [['1 mutation', 'le1'], ['2 mutations', 'le2'], ['5 mutations', 'le5']];
+  document.getElementById('leak-tbody').innerHTML = ROWS.map(([lab, k]) => {
+    const c = (sp, sc, cls) => `<td class="${cls}">${(D.leakage[sp][sc][k] * 100).toFixed(1)}%</td>`;
+    return `<tr><td>${lab}</td>${c('mouse','random','hi')}${c('mouse','v_gene','lo')}${c('macaque','random','hi')}${c('macaque','v_gene','lo')}</tr>`;
+  }).join('') + `<tr><td>median distance</td>` +
+    ['mouse','macaque'].flatMap(sp => ['random','v_gene'].map(sc =>
+      `<td class="${sc === 'random' ? 'hi' : 'lo'}">${D.leakage[sp][sc].median.toFixed(0)}</td>`)).join('') + `</tr>`;
+
+  // ---------- dedup pies ----------
+  function drawPie(hostId, sp) {
+    const host = document.getElementById(hostId);
+    const W = Math.max(280, host.clientWidth), H = 336;
+    const cx = W / 2, cy = 128, R = 86, gap = 0.016;
+    const f = D.funnel[sp];
+    const parts = [
+      { lab: 'unique', v: f.unique, cv: '--s1' },
+      { lab: 'duplicates', v: f.qc - f.unique, cv: '--s2' },
+      { lab: 'failed QC', v: f.raw - f.qc, cv: '--s3' },
+    ];
+    let a0 = -Math.PI / 2, s = '';
+    parts.forEach(p => {
+      const frac = p.v / f.raw, a1 = a0 + frac * 2 * Math.PI;
+      const s0 = a0 + gap / 2, s1 = Math.max(s0, a1 - gap / 2);
+      const large = (s1 - s0) > Math.PI ? 1 : 0;
+      const x0 = cx + R * Math.cos(s0), y0 = cy + R * Math.sin(s0);
+      const x1 = cx + R * Math.cos(s1), y1 = cy + R * Math.sin(s1);
+      s += `<path d="M ${cx} ${cy} L ${x0.toFixed(1)} ${y0.toFixed(1)} A ${R} ${R} 0 ${large} 1 ${x1.toFixed(1)} ${y1.toFixed(1)} Z" style="fill:var(${p.cv})"/>`;
+      // Labels sit outside the arc in theme ink: white-on-fill would fail
+      // contrast on the lighter segments.
+      const mid = (s0 + s1) / 2, lr = R * 1.14;
+      const lx = cx + lr * Math.cos(mid), ly = cy + lr * Math.sin(mid);
+      const anchor = Math.cos(mid) > 0.15 ? 'start' : (Math.cos(mid) < -0.15 ? 'end' : 'middle');
+      s += `<text class="piepct" x="${lx.toFixed(1)}" y="${(ly + 4).toFixed(1)}" text-anchor="${anchor}" style="fill:var(${p.cv})">${(frac * 100).toFixed(1)}%</text>`;
+      a0 = a1;
+    });
+    s += `<text class="pielab" x="${cx}" y="${cy + R + 40}" text-anchor="middle" style="fill:var(--ink)">${sp}: ${fmt(f.raw)} raw reads</text>`;
+    const lines = [
+      [`${fmt(f.unique)} unique frameworks`, '--s1'],
+      [`${fmt(f.qc - f.unique)} exact duplicates`, '--s2'],
+      [`${fmt(f.raw - f.qc)} failed QC`, '--s3'],
+    ];
+    lines.forEach(([t, cv], i) => {
+      s += `<text class="tick" x="${cx}" y="${cy + R + 58 + i * 14}" text-anchor="middle" style="fill:var(${cv})">${t}</text>`;
+    });
+    svg(hostId, W, H, s, `${sp} deduplication funnel: ${(100 * f.unique / f.raw).toFixed(1)} percent of raw reads become unique frameworks.`);
+  }
+
+  function drawAll() {
+    curveGeom = drawCurve();
+    drawLeak('p-leak-mouse', 'mouse'); drawLeak('p-leak-macaque', 'macaque');
+    drawPie('p-pie-mouse', 'mouse'); drawPie('p-pie-macaque', 'macaque');
+  }
+  drawAll();
+  let raf;
+  new ResizeObserver(() => { cancelAnimationFrame(raf); raf = requestAnimationFrame(drawAll); }).observe(document.body);
+})();
+</script>
+</body>
+</html>
