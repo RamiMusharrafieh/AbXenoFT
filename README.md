@@ -248,7 +248,7 @@ every figure in `docs/` can be regenerated without re-running training.
 
 ---
 
-## A negative result worth keeping
+## Design note
 
 The first design was **one** joint model with a species marker token prepended
 (`B` for mouse, `O` for macaque, both real ESM-2 vocabulary entries that never occur in
