@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 440" width="900" height="440" role="img" aria-label="Cumulative worldwide antibody approvals by generation technology, 1994 to 2025. Humanized reaches 98, fully human 67, chimeric 20, murine 5.">
+<text x="52" y="26" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="17" font-weight="600" fill="#0b0b0b">Cumulative worldwide antibody approvals</text>
+<text x="52" y="44" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12.5" fill="#52514e">By generation technology, 1994 to 2025 (n = 190)</text>
+<line x1="52" y1="384.0" x2="768" y2="384.0" stroke="#e1e0d9" stroke-width="1"/>
+<text x="43.0" y="387.6" text-anchor="end" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#8a8880">0</text>
+<line x1="52" y1="301.5" x2="768" y2="301.5" stroke="#e1e0d9" stroke-width="1"/>
+<text x="43.0" y="305.1" text-anchor="end" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#8a8880">25</text>
+<line x1="52" y1="219.0" x2="768" y2="219.0" stroke="#e1e0d9" stroke-width="1"/>
+<text x="43.0" y="222.6" text-anchor="end" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#8a8880">50</text>
+<line x1="52" y1="136.5" x2="768" y2="136.5" stroke="#e1e0d9" stroke-width="1"/>
+<text x="43.0" y="140.1" text-anchor="end" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#8a8880">75</text>
+<line x1="52" y1="54.0" x2="768" y2="54.0" stroke="#e1e0d9" stroke-width="1"/>
+<text x="43.0" y="57.6" text-anchor="end" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#8a8880">100</text>
+<text x="75.1" y="404.0" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#8a8880">1995</text>
+<text x="190.6" y="404.0" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#8a8880">2000</text>
+<text x="306.1" y="404.0" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#8a8880">2005</text>
+<text x="421.5" y="404.0" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#8a8880">2010</text>
+<text x="537.0" y="404.0" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#8a8880">2015</text>
+<text x="652.5" y="404.0" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#8a8880">2020</text>
+<text x="768.0" y="404.0" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#8a8880">2025</text>
+<line x1="236.8" y1="62" x2="236.8" y2="384.0" stroke="#2a78d6" stroke-width="1" opacity="0.45"/>
+<text x="243.8" y="73" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#2a78d6">2002 first fully human (adalimumab)</text>
+<path d="M52.0 384.0 L75.1 384.0 L98.2 384.0 L121.3 384.0 L144.4 384.0 L167.5 384.0 L190.6 384.0 L213.7 384.0 L236.8 380.7 L259.9 380.7 L283.0 380.7 L306.1 380.7 L329.2 380.7 L352.3 380.7 L375.4 380.7 L398.5 377.4 L421.5 377.4 L444.6 377.4 L467.7 377.4 L490.8 374.1 L513.9 370.8 L537.0 370.8 L560.1 370.8 L583.2 370.8 L606.3 370.8 L629.4 367.5 L652.5 367.5 L675.6 367.5 L698.7 367.5 L721.8 367.5 L744.9 367.5 L768.0 367.5" fill="none" stroke="#eda100" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="768.0" cy="367.5" r="3.8" fill="#eda100"/>
+<text x="779.0" y="371.5" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="12" font-weight="500" fill="#eda100">5 murine</text>
+<path d="M52.0 380.7 L75.1 380.7 L98.2 380.7 L121.3 377.4 L144.4 370.8 L167.5 370.8 L190.6 370.8 L213.7 370.8 L236.8 370.8 L259.9 367.5 L283.0 367.5 L306.1 367.5 L329.2 367.5 L352.3 367.5 L375.4 367.5 L398.5 367.5 L421.5 367.5 L444.6 364.2 L467.7 364.2 L490.8 364.2 L513.9 360.9 L537.0 357.6 L560.1 354.3 L583.2 354.3 L606.3 354.3 L629.4 354.3 L652.5 341.1 L675.6 341.1 L698.7 327.9 L721.8 324.6 L744.9 321.3 L768.0 318.0" fill="none" stroke="#1baf7a" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="768.0" cy="318.0" r="3.8" fill="#1baf7a"/>
+<text x="779.0" y="322.0" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="12" font-weight="500" fill="#1baf7a">20 chimeric</text>
+<path d="M52.0 384.0 L75.1 384.0 L98.2 384.0 L121.3 384.0 L144.4 377.4 L167.5 377.4 L190.6 374.1 L213.7 370.8 L236.8 367.5 L259.9 364.2 L283.0 357.6 L306.1 354.3 L329.2 351.0 L352.3 347.7 L375.4 344.4 L398.5 344.4 L421.5 344.4 L444.6 344.4 L467.7 337.8 L490.8 327.9 L513.9 321.3 L537.0 311.4 L560.1 301.5 L583.2 288.3 L606.3 265.2 L629.4 235.5 L652.5 209.1 L675.6 186.0 L698.7 153.0 L721.8 113.4 L744.9 63.9 L768.0 60.6" fill="none" stroke="#eb6834" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="768.0" cy="60.6" r="3.8" fill="#eb6834"/>
+<text x="779.0" y="64.6" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="12" font-weight="500" fill="#eb6834">98 humanized</text>
+<path d="M52.0 384.0 L75.1 384.0 L98.2 384.0 L121.3 384.0 L144.4 384.0 L167.5 384.0 L190.6 384.0 L213.7 384.0 L236.8 380.7 L259.9 380.7 L283.0 380.7 L306.1 380.7 L329.2 377.4 L352.3 377.4 L375.4 377.4 L398.5 364.2 L421.5 357.6 L444.6 351.0 L467.7 347.7 L490.8 347.7 L513.9 337.8 L537.0 324.6 L560.1 314.7 L583.2 298.2 L606.3 278.4 L629.4 275.1 L652.5 261.9 L675.6 222.3 L698.7 205.8 L721.8 189.3 L744.9 169.5 L768.0 162.9" fill="none" stroke="#2a78d6" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="768.0" cy="162.9" r="3.8" fill="#2a78d6"/>
+<text x="779.0" y="166.9" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="12" font-weight="500" fill="#2a78d6">67 fully human</text>
+<line x1="52" y1="384.0" x2="768" y2="384.0" stroke="#c3c2b7" stroke-width="1"/>
+<text x="52" y="432" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="11.5" fill="#52514e">year of first approval in any jurisdiction</text>
+<text x="43" y="46" text-anchor="end" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="11.5" fill="#8a8880">approvals</text>
+</svg>

@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 400" width="900" height="400" role="img" aria-label="Validation loss for three training runs on a log axis, falling from about 2.35 to 0.198 for the random split, 0.385 for mouse held-out genes and 0.443 for macaque.">
+<text x="52" y="26" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="17" font-weight="600" fill="#e9e9e4">Validation loss across training</text>
+<text x="52" y="44" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12.5" fill="#c3c2b7">Cross-entropy on held-out sequences, log axis. All three runs converge by roughly the halfway point.</text>
+<rect x="52.0" y="61" width="14" height="3" rx="1.5" fill="#3987e5"/>
+<text x="72.0" y="68" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#c3c2b7">mouse, random split</text>
+<rect x="203.4" y="61" width="14" height="3" rx="1.5" fill="#d95926"/>
+<text x="223.4" y="68" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#c3c2b7">mouse, V genes held out</text>
+<rect x="381.2" y="61" width="14" height="3" rx="1.5" fill="#199e70"/>
+<text x="401.2" y="68" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#c3c2b7">macaque, V genes held out</text>
+<line x1="56" y1="332.4" x2="750" y2="332.4" stroke="#2c2c2a" stroke-width="1"/>
+<text x="47.0" y="336.0" text-anchor="end" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#8a8880">0.2</text>
+<line x1="56" y1="293.4" x2="750" y2="293.4" stroke="#2c2c2a" stroke-width="1"/>
+<text x="47.0" y="297.0" text-anchor="end" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#8a8880">0.3</text>
+<line x1="56" y1="244.4" x2="750" y2="244.4" stroke="#2c2c2a" stroke-width="1"/>
+<text x="47.0" y="248.0" text-anchor="end" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#8a8880">0.5</text>
+<line x1="56" y1="177.8" x2="750" y2="177.8" stroke="#2c2c2a" stroke-width="1"/>
+<text x="47.0" y="181.4" text-anchor="end" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#8a8880">1.0</text>
+<line x1="56" y1="111.2" x2="750" y2="111.2" stroke="#2c2c2a" stroke-width="1"/>
+<text x="47.0" y="114.8" text-anchor="end" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#8a8880">2.0</text>
+<text x="56.0" y="368.0" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#8a8880">0</text>
+<text x="179.9" y="368.0" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#8a8880">25k</text>
+<text x="303.9" y="368.0" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#8a8880">50k</text>
+<text x="427.8" y="368.0" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#8a8880">75k</text>
+<text x="551.7" y="368.0" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#8a8880">100k</text>
+<text x="675.6" y="368.0" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#8a8880">125k</text>
+<path d="M56.0 96.0 L80.8 267.7 L105.6 296.5 L130.4 309.5 L155.1 313.3 L179.9 318.3 L204.7 322.1 L229.5 324.1 L254.3 325.4 L279.1 323.5 L303.9 327.6 L328.6 327.8 L353.4 327.4 L378.2 328.1 L403.0 329.3 L427.8 329.6 L452.6 331.0 L477.4 330.8 L502.1 331.5 L526.9 332.1 L551.7 331.1 L576.5 332.9 L601.3 332.7 L626.1 331.8 L650.9 332.0 L675.6 331.8 L700.4 332.7 L725.2 331.1 L742.0 333.2" fill="none" stroke="#3987e5" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="742.0" cy="333.2" r="3.8" fill="#3987e5"/>
+<text x="752.0" y="337.2" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="12" font-weight="500" fill="#3987e5">0.198</text>
+<path d="M56.0 95.6 L80.8 243.2 L105.6 254.4 L130.4 256.7 L155.1 257.6 L179.9 262.1 L204.7 264.4 L229.5 261.8 L254.3 262.7 L279.1 265.4 L303.9 264.9 L328.6 263.9 L353.4 267.3 L378.2 264.5 L403.0 266.9 L427.8 265.4 L452.6 265.6 L477.4 266.9 L502.1 268.4 L526.9 267.2 L551.7 268.5 L576.5 269.2 L601.3 269.4 L626.1 268.9 L650.9 266.9 L675.6 268.8 L700.4 268.8 L721.2 267.8" fill="none" stroke="#d95926" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="721.2" cy="267.8" r="3.8" fill="#d95926"/>
+<text x="731.2" y="271.8" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="12" font-weight="500" fill="#d95926">0.392</text>
+<path d="M56.0 95.8 L75.8 240.0 L95.7 246.4 L115.5 248.4 L135.3 251.3 L155.1 251.2 L175.0 252.6 L194.8 254.0 L214.6 252.5 L234.5 253.4 L254.3 253.1 L274.1 253.2 L293.9 253.9 L313.8 255.2 L333.6 256.0 L353.4 256.1 L353.8 255.9" fill="none" stroke="#199e70" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="353.8" cy="255.9" r="3.8" fill="#199e70"/>
+<text x="363.8" y="259.9" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="12" font-weight="500" fill="#199e70">0.443</text>
+<line x1="56" y1="348.0" x2="750" y2="348.0" stroke="#3d3d39" stroke-width="1"/>
+<text x="56" y="392" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="11.5" fill="#c3c2b7">training step</text>
+<text x="47" y="76" text-anchor="end" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="11.5" fill="#8a8880">loss</text>
+</svg>

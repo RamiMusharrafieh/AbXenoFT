@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 400" width="900" height="400" role="img" aria-label="Accuracy by positional conservation for both species. At variable positions the mouse model scores 84.9 percent against the lookup table 44.8 percent; at invariant positions both reach 97 percent.">
+<text x="52" y="26" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="17" font-weight="600" fill="#e9e9e4">Where the models beat the consensus control</text>
+<text x="52" y="44" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12.5" fill="#c3c2b7">Accuracy by how conserved each masked position is. The margin is concentrated at variable positions.</text>
+<rect x="52.0" y="61" width="14" height="3" rx="1.5" fill="#3987e5"/>
+<text x="72.0" y="68" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#c3c2b7">fine-tuned model</text>
+<rect x="183.6" y="61" width="14" height="3" rx="1.5" fill="#54524b"/>
+<text x="203.6" y="68" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#c3c2b7">consensus lookup</text>
+<text x="56" y="82" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="13" font-weight="600" fill="#e9e9e4">Mouse</text>
+<line x1="56" y1="324.0" x2="436" y2="324.0" stroke="#2c2c2a" stroke-width="1"/>
+<text x="48.0" y="327.6" text-anchor="end" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#8a8880">0</text>
+<line x1="56" y1="266.0" x2="436" y2="266.0" stroke="#2c2c2a" stroke-width="1"/>
+<text x="48.0" y="269.6" text-anchor="end" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#8a8880">25</text>
+<line x1="56" y1="208.0" x2="436" y2="208.0" stroke="#2c2c2a" stroke-width="1"/>
+<text x="48.0" y="211.6" text-anchor="end" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#8a8880">50</text>
+<line x1="56" y1="150.0" x2="436" y2="150.0" stroke="#2c2c2a" stroke-width="1"/>
+<text x="48.0" y="153.6" text-anchor="end" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#8a8880">75</text>
+<line x1="56" y1="92.0" x2="436" y2="92.0" stroke="#2c2c2a" stroke-width="1"/>
+<text x="48.0" y="95.6" text-anchor="end" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="11" fill="#8a8880">100</text>
+<rect x="65.1" y="127.0" width="21.5" height="197.0" rx="2" fill="#3987e5"/>
+<rect x="88.7" y="220.0" width="21.5" height="104.0" rx="2" fill="#54524b"/>
+<text x="87.7" y="121.0" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="10.5" font-weight="500" fill="#3987e5">85</text>
+<text x="87.7" y="341.0" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="10" fill="#8a8880">0.00</text>
+<rect x="128.5" y="115.6" width="21.5" height="208.4" rx="2" fill="#3987e5"/>
+<rect x="152.0" y="183.1" width="21.5" height="140.9" rx="2" fill="#54524b"/>
+<text x="151.0" y="109.6" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="10.5" font-weight="500" fill="#3987e5">90</text>
+<text x="151.0" y="341.0" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="10" fill="#8a8880">0.50</text>
+<rect x="191.8" y="116.3" width="21.5" height="207.7" rx="2" fill="#3987e5"/>
+<rect x="215.3" y="139.8" width="21.5" height="184.2" rx="2" fill="#54524b"/>
+<text x="214.3" y="110.3" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="10.5" font-weight="500" fill="#3987e5">90</text>
+<text x="214.3" y="341.0" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="10" fill="#8a8880">0.70</text>
+<rect x="255.1" y="105.1" width="21.5" height="218.9" rx="2" fill="#3987e5"/>
+<rect x="278.7" y="110.6" width="21.5" height="213.4" rx="2" fill="#54524b"/>
+<text x="277.7" y="99.1" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="10.5" font-weight="500" fill="#3987e5">94</text>
+<text x="277.7" y="341.0" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="10" fill="#8a8880">0.85</text>
+<rect x="318.5" y="97.8" width="21.5" height="226.2" rx="2" fill="#3987e5"/>
+<rect x="342.0" y="98.0" width="21.5" height="226.0" rx="2" fill="#54524b"/>
+<text x="341.0" y="91.8" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="10.5" font-weight="500" fill="#3987e5">98</text>
+<text x="341.0" y="341.0" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="10" fill="#8a8880">0.95</text>
+<rect x="381.8" y="92.6" width="21.5" height="231.4" rx="2" fill="#3987e5"/>
+<rect x="405.3" y="92.6" width="21.5" height="231.4" rx="2" fill="#54524b"/>
+<text x="404.3" y="86.6" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="10.5" font-weight="500" fill="#3987e5">100</text>
+<text x="404.3" y="341.0" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="10" fill="#8a8880">0.99+</text>
+<line x1="56" y1="324" x2="436" y2="324" stroke="#3d3d39" stroke-width="1"/>
+<text x="56" y="364" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="11" fill="#c3c2b7">positional conservation (bucket lower bound)</text>
+<text x="500" y="82" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="13" font-weight="600" fill="#e9e9e4">Macaque</text>
+<line x1="500" y1="324.0" x2="880" y2="324.0" stroke="#2c2c2a" stroke-width="1"/>
+<line x1="500" y1="266.0" x2="880" y2="266.0" stroke="#2c2c2a" stroke-width="1"/>
+<line x1="500" y1="208.0" x2="880" y2="208.0" stroke="#2c2c2a" stroke-width="1"/>
+<line x1="500" y1="150.0" x2="880" y2="150.0" stroke="#2c2c2a" stroke-width="1"/>
+<line x1="500" y1="92.0" x2="880" y2="92.0" stroke="#2c2c2a" stroke-width="1"/>
+<rect x="509.1" y="227.7" width="21.5" height="96.3" rx="2" fill="#d95926"/>
+<rect x="532.7" y="285.9" width="21.5" height="38.1" rx="2" fill="#54524b"/>
+<text x="531.7" y="221.7" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="10.5" font-weight="500" fill="#d95926">42</text>
+<text x="531.7" y="341.0" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="10" fill="#8a8880">0.00</text>
+<rect x="572.5" y="126.3" width="21.5" height="197.7" rx="2" fill="#d95926"/>
+<rect x="596.0" y="216.4" width="21.5" height="107.6" rx="2" fill="#54524b"/>
+<text x="595.0" y="120.3" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="10.5" font-weight="500" fill="#d95926">85</text>
+<text x="595.0" y="341.0" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="10" fill="#8a8880">0.50</text>
+<rect x="635.8" y="117.5" width="21.5" height="206.5" rx="2" fill="#d95926"/>
+<rect x="659.3" y="166.5" width="21.5" height="157.5" rx="2" fill="#54524b"/>
+<text x="658.3" y="111.5" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="10.5" font-weight="500" fill="#d95926">89</text>
+<text x="658.3" y="341.0" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="10" fill="#8a8880">0.70</text>
+<rect x="699.1" y="107.4" width="21.5" height="216.6" rx="2" fill="#d95926"/>
+<rect x="722.7" y="122.4" width="21.5" height="201.6" rx="2" fill="#54524b"/>
+<text x="721.7" y="101.4" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="10.5" font-weight="500" fill="#d95926">93</text>
+<text x="721.7" y="341.0" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="10" fill="#8a8880">0.85</text>
+<rect x="762.5" y="99.0" width="21.5" height="225.0" rx="2" fill="#d95926"/>
+<rect x="786.0" y="99.0" width="21.5" height="225.0" rx="2" fill="#54524b"/>
+<text x="785.0" y="93.0" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="10.5" font-weight="500" fill="#d95926">97</text>
+<text x="785.0" y="341.0" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="10" fill="#8a8880">0.95</text>
+<rect x="825.8" y="94.0" width="21.5" height="230.0" rx="2" fill="#d95926"/>
+<rect x="849.3" y="94.0" width="21.5" height="230.0" rx="2" fill="#54524b"/>
+<text x="848.3" y="88.0" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="10.5" font-weight="500" fill="#d95926">99</text>
+<text x="848.3" y="341.0" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="10" fill="#8a8880">0.99+</text>
+<line x1="500" y1="324" x2="880" y2="324" stroke="#3d3d39" stroke-width="1"/>
+<text x="500" y="364" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="11" fill="#c3c2b7">positional conservation (bucket lower bound)</text>
+</svg>
