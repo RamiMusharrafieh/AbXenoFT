@@ -44,7 +44,7 @@ generation technology, 1994–2025.
 A fully human antibody cannot be administered in animal models without immunogenicity concerns. For instance, introduction of a fully human antibody in an inbred mouse or outbread rhesus macaque may be seen as a foreign protein to the host. This may result in the animal raising anti-drug antibodies or proinflammatory responses against the
 species-specific framework regions, which may limit or convolute efficacy/safety and translational studies. 
 
-The standard strategy to solve this issue is to engineer a species-matched antibody surrogate. However, this is tedious and done manually, resulting in error or relying heavily on sequence conservation for design. Therefore, these are fine tuned machine learning models to generate either rhesus macaque or murine antibodies directly from the human sequence.
+The standard strategy to solve this issue is to engineer a species-matched antibody surrogate. However, this is tedious and done manually, resulting in error or relying heavily on sequence conservation for design. AbXenoFT solves this problem by implementing fine tuned machine learning models to generate either rhesus macaque or murine antibodies directly from the human sequence.
 
 
 
