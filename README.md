@@ -20,14 +20,9 @@ python convert_framework.py --to mouse \
 
 ## Introduction
 
-Therapeutic antibodies moved from murine to chimeric to humanized to fully human.
-Of 190 approved antibodies with a known sequence source, **67 are fully human, and
+Therapeutic antibodies come in many different formats, including chemeric and humanized versions. A growing number of approved antibodies are fully human thanks to the development of transgenic mouse models, and fully human display libraries. In total, of 190 approved antibodies with a known sequence source, **67 are fully human, and
 34 of those were approved in 2020–25 alone**, more than the field produced in its
-entire first two decades.
-
-A fully human antibody introduced into a naive mouse may be considered a foreign protein: the animal raises anti-drug antibodies against the
-framework, which limits repeat-dose studies or translational accuracy. The standard answer is a species-matched
-surrogate. These models generate one directly from the human sequence.
+entire first two decades. 
 
 📊 **[The Human Antibody Gap](docs/07-approvals.html)**: cumulative approvals by
 generation technology, 1994–2025.
@@ -38,6 +33,14 @@ generation technology, 1994–2025.
 | **Fully human** | **67** |
 | Chimeric | 20 |
 | Murine | 5 (last in 2019) |
+
+
+A fully human antibody cannot be administered in animal models without immunogenicity concerns. For instance, introduction of a fully human antibody in an inbred mouse or outbread rhesus macaque may be seen as a foreign protein to the host. This may result in the animal raising anti-drug antibodies or proinflammatory responses against the
+species-specific framework regions, which may limit or convolute efficacy/safety and translational studies. 
+
+The standard strategy to solve this issue is to engineer a species-matched antibody surrogate. However, this is tedious and done manually, resulting in error or relying heavily on sequence conservation for design. Therefore, these are fine tuned machine learning models to generate either rhesus macaque or murine antibodies directly from the human sequence.
+
+
 
 ---
 
