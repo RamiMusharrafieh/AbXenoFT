@@ -1,4 +1,4 @@
-# Murinization
+# AbXenoFT
 
 **Species-conditioned antibody framework models.** Give it a human antibody's
 framework regions, get back a mouse or macaque version with the same CDRs on a
