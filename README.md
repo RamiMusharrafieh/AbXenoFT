@@ -1,3 +1,4 @@
+[READMEv2.md](https://github.com/user-attachments/files/31810544/READMEv2.md)
 # AbXenoFT
 
 **Species-conditioned antibody framework models.** Give it a human antibody's
@@ -23,6 +24,11 @@ python convert_framework.py --to mouse \
 Therapeutic antibodies come in many different formats, including chemeric and humanized versions. Fully human antibodies represent a large and growing number of therapeutic antibodies as a result of technological development in transgenic mouse models and adaptation of fully human display libraries. In total, of 190 approved antibodies with a known sequence source, **67 are fully human, and
 34 of those were approved in 2020–25 alone**, more than the field produced in its
 entire first two decades. 
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/approvals-dark.svg">
+  <img alt="Cumulative worldwide antibody approvals by generation technology, 1994 to 2025. Humanized reaches 98, fully human 67, chimeric 20, murine 5. The fully human curve begins in 2002 with adalimumab and is the fastest growing since." src="docs/approvals-light.svg" width="100%">
+</picture>
 
 📊 **[The Human Antibody Gap](docs/07-approvals.html)**: cumulative approvals by
 generation technology, 1994–2025.
@@ -69,6 +75,11 @@ The fine-tuned models outperform the baseline primarily at low-conservation posi
 | 0.85–0.95 | 94.4% / 92.0% | 93.3% / 86.9% |
 | > 0.95 (invariant) | 97.5% / 97.4% | 97.0% / 97.0% |
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/conservation-dark.svg">
+  <img alt="Accuracy by positional conservation for both species. At variable positions the mouse model scores 84.9 percent against the consensus lookup 44.8 percent, while at invariant positions both reach about 97 percent." src="docs/conservation-light.svg" width="100%">
+</picture>
+
 📊 [Mouse diagnostics](docs/04-diagnostics-mouse.html) ·
 [Two-species QC](docs/05-diagnostics-two-species.html)
 
@@ -90,6 +101,11 @@ split.
 Results from splitting: 94.77% on a random split versus 90.13% on held-out
 germlines. The ~4.6-point gap is the drop when predicting unseen V gene.
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/leakage-dark.svg">
+  <img alt="Measured train and validation leakage. Under a random split 50.7 percent of mouse validation sequences sit within two mutations of a training sequence, against 4.0 percent when whole V genes are held out." src="docs/leakage-light.svg" width="100%">
+</picture>
+
 📊 [Germline generalization](docs/02-germline-generalization.html) ·
 [Data controls](docs/06-data-controls.html)
 
@@ -102,6 +118,11 @@ germlines. The ~4.6-point gap is the drop when predicting unseen V gene.
 
 Apple M1 (MPS), batch size 16. Only 2,580,513 of 7,523,034 parameters train, because
 embeddings and encoder layers 0–3 are frozen.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/loss-curves-dark.svg">
+  <img alt="Validation loss for the three training runs on a log axis, falling from about 2.35 at initialisation to 0.198 for the random split, 0.385 for mouse with V genes held out, and 0.443 for macaque." src="docs/loss-curves-light.svg" width="100%">
+</picture>
 
 📊 [Mouse run](docs/01-framework-run.html) · [Full epoch](docs/03-full-epoch.html)
 
