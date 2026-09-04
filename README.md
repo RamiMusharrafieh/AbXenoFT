@@ -20,7 +20,7 @@ python convert_framework.py --to mouse \
 
 ## Introduction
 
-Therapeutic antibodies come in many different formats, including chimeric and humanized versions. Fully human antibodies represent a large and growing number of therapeutic antibodies as a result of technological development in transgenic mouse models and adaptation of fully human display libraries. In total, of 190 approved antibodies with a known sequence source, 67 are fully human, and
+Therapeutic antibodies come in many different formats, including chimeric and humanized versions. Fully human antibodies represent a large and growing number of therapeutic antibodies as a result of technological development in transgenic mouse models and adoption of fully human display libraries. In total, of 190 approved antibodies with a known sequence source, 67 are fully human, and
 34 of those were approved in 2020–25 alone, more than the field produced in its
 entire first two decades. 
 
