@@ -1,7 +1,6 @@
-[READMEv2.md](https://github.com/user-attachments/files/31810544/READMEv2.md)
 # AbXenoFT
 
-**Species-conditioned antibody framework models.** Give it a human antibody's
+Species-conditioned antibody framework models. Give it a human antibody's
 framework regions, get back a mouse or macaque version with the same CDRs on a
 species-matched scaffold, for in vivo work in immunocompetent animals.
 
@@ -21,8 +20,8 @@ python convert_framework.py --to mouse \
 
 ## Introduction
 
-Therapeutic antibodies come in many different formats, including chimeric and humanized versions. Fully human antibodies represent a large and growing number of therapeutic antibodies as a result of technological development in transgenic mouse models and adaptation of fully human display libraries. In total, of 190 approved antibodies with a known sequence source, **67 are fully human, and
-34 of those were approved in 2020–25 alone**, more than the field produced in its
+Therapeutic antibodies come in many different formats, including chimeric and humanized versions. Fully human antibodies represent a large and growing number of therapeutic antibodies as a result of technological development in transgenic mouse models and adaptation of fully human display libraries. In total, of 190 approved antibodies with a known sequence source, 67 are fully human, and
+34 of those were approved in 2020–25 alone, more than the field produced in its
 entire first two decades. 
 
 <picture>
@@ -30,7 +29,7 @@ entire first two decades.
   <img alt="Cumulative worldwide antibody approvals by generation technology, 1994 to 2025. Humanized reaches 98, fully human 67, chimeric 20, murine 5. The fully human curve begins in 2002 with adalimumab and is the fastest growing since." src="docs/approvals-light.svg" width="100%">
 </picture>
 
-📊 **[The Human Antibody Gap](docs/07-approvals.html)**: cumulative approvals by
+📊 [The Human Antibody Gap](docs/07-approvals.html): cumulative approvals by
 generation technology, 1994–2025.
 
 | Technology | Cumulative by 2025 |
@@ -93,8 +92,8 @@ each validation sequence to its nearest training sequence:
 | 1 mutation | 12.3% | **0.5%** | 8.4% | **1.7%** |
 | 2 mutations | **50.7%** | **4.0%** | 31.3% | 9.3% |
 
-Under a random split, **half the mouse validation set sits within two mutations of
-something the model trained on**. These are somatic-hypermutation variants of the same
+Under a random split, half the mouse validation set sits within two mutations of
+something the model trained on. These are somatic-hypermutation variants of the same
 germline landing on both sides. Every headline number in this repo uses the V-gene
 split.
 
@@ -120,6 +119,11 @@ Apple M1 (MPS), batch size 16. Only 2,580,513 of 7,523,034 parameters train, bec
 embeddings and encoder layers 0–3 are frozen.
 
 <picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/architecture-dark.svg">
+  <img alt="ESM-2 encoder stack of six layers. The embeddings and layers 0 to 3 are frozen, holding 4,942,521 parameters. Layers 4 and 5 plus the MLM head are trainable, holding 2,580,513 parameters, or 34.3 percent of the model." src="docs/architecture-light.svg" width="100%">
+</picture>
+
+<picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/loss-curves-dark.svg">
   <img alt="Validation loss for the three training runs on a log axis, falling from about 2.35 at initialisation to 0.198 for the random split, 0.385 for mouse with V genes held out, and 0.443 for macaque." src="docs/loss-curves-light.svg" width="100%">
 </picture>
@@ -137,7 +141,7 @@ nothing in it is mouse or macaque.
 python examples/adalimumab.py
 ```
 
-**The models place a human framework closer to the primate, unprompted.** Neither
+The models place a human framework closer to the primate, unprompted. Neither
 was shown a human sequence in training, nor told anything about phylogeny:
 
 ```
@@ -184,7 +188,7 @@ antibody intact, then asks the target species' model what belongs there. Positio
 the target species already accepts are left alone. All 91 masked variants go through
 as a single batch.
 
-**The species switch selects a model, not a token.** See the negative result below.
+The species switch selects a model, not a token. See the negative result below.
 
 ---
 
@@ -236,6 +240,7 @@ python train_mlm_esm2.py --epochs 1 --eval-steps 5000 --max-eval-samples 10000 \
 ├── analysis_qc.py             consensus control, stratified error, confusion, PCA
 ├── analysis_leakage.py        measured train/val leakage + dedup funnel
 ├── verify_generalization.py   masked recovery across models
+├── make_readme_figure.py      regenerates the README figures
 ├── examples/                  adalimumab worked example
 ├── docs/                      seven standalone interactive reports
 ├── analysis/                  derived JSON (tracked, makes reports reproducible)
@@ -250,13 +255,13 @@ every figure in `docs/` can be regenerated without re-running training.
 
 ## Design note
 
-The first design was **one** joint model with a species marker token prepended
+The first design was one joint model with a species marker token prepended
 (`B` for mouse, `O` for macaque, both real ESM-2 vocabulary entries that never occur in
 antibody frameworks). It does not work, and `train_joint_species.py` is kept in the
 repo to document why.
 
 At 4% of training the switch was already inert: converting the same sequence to mouse
-and to macaque produced **byte-identical output**, with log-likelihoods agreeing to
+and to macaque produced byte-identical output, with log-likelihoods agreeing to
 four decimals. The cause is structural, not due to training. With 15% masking,
 the 85% of residues still visible identify the species unambiguously, so the marker
 carries no information, receives no gradient, and is ignored. Conversion then asks the
@@ -270,23 +275,23 @@ answer in mouse. That is why the switch selects a model.
 
 ## Scope and limitations
 
-**Framework conversion is not a full surrogate.** It addresses immunogenicity against
+Framework conversion is not a full surrogate. It addresses immunogenicity against
 the framework. It does *not* confer binding to a rodent ortholog of the target: the
 CDRs are deliberately unchanged, so specificity is unchanged. Where a human antibody
 does not recognise the mouse antigen, a framework-converted version will not either,
 and a true surrogate with different CDRs is still needed. Macaque is the stronger case:
 primate targets are usually homologous enough that cross-reactivity already holds.
 
-**Confidence is not accuracy.** The model reports a probability; the QC reports
+Confidence is not accuracy. The model reports a probability; the QC reports
 measured per-position accuracy, and they can disagree sharply. The hardest positions
 in both species flank the CDRs, and macaque position 41 is only 24.4% accurate, because
 those Vernier-zone residues are structurally coupled to CDRs the model never sees.
 Cross-check proposals against `analysis/qc_results_*.json`.
 
-**Heavy chain only**, IgM, and the canonical 91-residue framework layout (97–100% of
+Heavy chain only, IgM, and the canonical 91-residue framework layout (97–100% of
 sequences). Light chains and non-canonical lengths are not handled.
 
-**Input is the four framework regions**, not a raw VH, because splitting a full VH needs
+Input is the four framework regions, not a raw VH, because splitting a full VH needs
 ANARCI-style numbering, which is not wired in.
 
 ---
