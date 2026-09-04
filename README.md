@@ -29,16 +29,6 @@ entire first two decades.
   <img alt="Cumulative worldwide antibody approvals by generation technology, 1994 to 2025. Humanized reaches 98, fully human 67, chimeric 20, murine 5. The fully human curve begins in 2002 with adalimumab and is the fastest growing since." src="docs/approvals-light.svg" width="100%">
 </picture>
 
-📊 [The Human Antibody Gap](docs/07-approvals.html): cumulative approvals by
-generation technology, 1994–2025.
-
-| Technology | Cumulative by 2025 |
-|---|---|
-| Humanized | 98 |
-| **Fully human** | **67** |
-| Chimeric | 20 |
-| Murine | 5 (last in 2019) |
-
 
 A fully human antibody cannot be administered in animal models without immunogenicity concerns. For instance, introduction of a fully human antibody in an inbred mouse or outbread rhesus macaque may be seen as a foreign protein to the host. This may result in the animal raising anti-drug antibodies or proinflammatory responses against the
 species-specific framework regions, which may limit or convolute efficacy/safety and translational studies. 
