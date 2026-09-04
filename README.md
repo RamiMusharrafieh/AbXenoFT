@@ -51,6 +51,29 @@ The standard strategy to solve this issue is to engineer a species-matched antib
 
 ## Results
 
+### Trained models
+
+| Model | Best eval loss | Perplexity | Held out | Steps | Wall clock |
+|---|---|---|---|---|---|
+| `esm2_t6_8M_mouse_fwr_vgene` | 0.3853 | 1.470 | 35 / 196 genes | 134,184 | 4.7 h |
+| `esm2_t6_8M_macaque_fwr_vgene` | 0.4427 | 1.557 | 29 / 126 genes | 60,083 | 2.9 h |
+
+Apple M1 (MPS), batch size 16. Only 2,580,513 of 7,523,034 parameters train, because
+embeddings and encoder layers 0–3 are frozen.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/architecture-dark.svg">
+  <img alt="ESM-2 encoder stack of six layers. The embeddings and layers 0 to 3 are frozen, holding 4,942,521 parameters. Layers 4 and 5 plus the MLM head are trainable, holding 2,580,513 parameters, or 34.3 percent of the model." src="docs/architecture-light.svg" width="100%">
+</picture>
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/loss-curves-dark.svg">
+  <img alt="Validation loss for the three training runs on a log axis, falling from about 2.35 at initialisation to 0.198 for the random split, 0.385 for mouse with V genes held out, and 0.443 for macaque." src="docs/loss-curves-light.svg" width="100%">
+</picture>
+
+📊 [Mouse run](docs/01-framework-run.html) · [Full epoch](docs/03-full-epoch.html)
+
+
 ### Model vs lookup-table control
 
 Antibody framework positions are highly conserved, so a model can score well by
@@ -108,27 +131,6 @@ germlines. The ~4.6-point gap is the drop when predicting unseen V gene.
 📊 [Germline generalization](docs/02-germline-generalization.html) ·
 [Data controls](docs/06-data-controls.html)
 
-### Trained models
-
-| Model | Best eval loss | Perplexity | Held out | Steps | Wall clock |
-|---|---|---|---|---|---|
-| `esm2_t6_8M_mouse_fwr_vgene` | 0.3853 | 1.470 | 35 / 196 genes | 134,184 | 4.7 h |
-| `esm2_t6_8M_macaque_fwr_vgene` | 0.4427 | 1.557 | 29 / 126 genes | 60,083 | 2.9 h |
-
-Apple M1 (MPS), batch size 16. Only 2,580,513 of 7,523,034 parameters train, because
-embeddings and encoder layers 0–3 are frozen.
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/architecture-dark.svg">
-  <img alt="ESM-2 encoder stack of six layers. The embeddings and layers 0 to 3 are frozen, holding 4,942,521 parameters. Layers 4 and 5 plus the MLM head are trainable, holding 2,580,513 parameters, or 34.3 percent of the model." src="docs/architecture-light.svg" width="100%">
-</picture>
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/loss-curves-dark.svg">
-  <img alt="Validation loss for the three training runs on a log axis, falling from about 2.35 at initialisation to 0.198 for the random split, 0.385 for mouse with V genes held out, and 0.443 for macaque." src="docs/loss-curves-light.svg" width="100%">
-</picture>
-
-📊 [Mouse run](docs/01-framework-run.html) · [Full epoch](docs/03-full-epoch.html)
 
 ---
 
